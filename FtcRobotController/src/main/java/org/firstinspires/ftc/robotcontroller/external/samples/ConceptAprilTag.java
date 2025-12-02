@@ -251,8 +251,36 @@ public class ConceptAprilTag extends LinearOpMode {
 //                    motor.setPower(1);   // far
 //                }
 
+/*            if (detection.id == 20) {
+                double distance = detection.ftcPose.range;  // inches
+                motor.setPower(distance/100 + 0.04); // test
+
+                if (distance < 30) {
+                    motor.setPower(0.3);   // close
+                } else if (distance < 40) {
+                    motor.setPower(0.4);
+                } else if (distance < 50) {
+                    motor.setPower(0.5);
+                } else if(distance < 60);{
+                    motor.setPower(0.6);
+                }
+                } else {
+                   motor.setPower(1);   // far
+                }*/
+
+
+
+
+
+
+
+
+
+
             if (detection.id == 20){
                 double bearing = detection.ftcPose.bearing;
+                double distance = detection.ftcPose.range;  // inches
+                motor.setPower(distance/100 + 0.05);
 
                 if (bearing > 0.3){
                     servo.setPower(-0.5);
