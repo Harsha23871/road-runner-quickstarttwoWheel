@@ -105,7 +105,7 @@ public class coneptsYAYAYAYAYAYAYAYAYA extends LinearOpMode {
 
                         motor.setVelocity(ticksPerSec);  // PIDF handles speed
 
-                        telemetry.addLine("--- Shooter ---");
+                         telemetry.addLine("--- Shooter ---");
                         telemetry.addData("v0 (m/s)", v0);
                         telemetry.addData("Motor ticks/sec", ticksPerSec);
 
