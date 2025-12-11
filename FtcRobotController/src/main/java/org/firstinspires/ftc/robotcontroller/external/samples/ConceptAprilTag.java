@@ -53,7 +53,7 @@ import java.util.List;
  * including Java Builder structures for specifying Vi    sion parameters.
  *
  * For an introduction to AprilTags, see the FTC-DOCS link below:
- * https://ftc-docs.firstinspires.org/en/latest/apriltag/vision_portal/apriltag_intro/apriltag-intro.html
+ * https://ftc-docs.firstinspires.org/en/lates     t/apriltag/vision_portal/apriltag_intro/apriltag-intro.html
  *
  * In this sample, any visible tag ID will be detected and displayed, but only tags that are included in the default
  * "TagLibrary" will have their      position and orientation information displayed.  This default TagLibrary contains
