@@ -12,10 +12,27 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcontroller.external.samples.ConceptAprilTag;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
+
+import java.util.List;
+
 
 @TeleOp(name = "TurretTele", group = "StarterBot")
 //@Disabled
-public class TurretTeleop extends OpMode {
+public class TurretTeleop extends OpMode  {
     final double FEED_TIME_SECONDS = 0.80; //The feeder servos run this long when a shot is requested.
     final double STOP_SPEED = 0.0; //We send this power to the servos when we want them to stop.
     final double FULL_SPEED = 1.0;
@@ -44,7 +61,7 @@ public class TurretTeleop extends OpMode {
     private CRServo leftFeeder = null;
     private CRServo rightFeeder = null;
     private Servo diverter = null;
-    private CRServo Angle = null;
+    private Servo Angle = null;
     private CRServo Aim = null;
 
 
@@ -109,7 +126,7 @@ public class TurretTeleop extends OpMode {
         leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
         rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
       //  diverter = hardwareMap.get(Servo.class, "diverter");
-        Angle = hardwareMap.get(CRServo.class, "angle");
+        Angle = hardwareMap.get(Servo.class,"Angle");
         Aim = hardwareMap.get(CRServo.class, "Aim");
         /*
          * To drive forward, most robots need the motor on one side to be reversed,
@@ -124,9 +141,7 @@ public class TurretTeleop extends OpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         outtake.setDirection(DcMotorSimple.Direction.FORWARD);
-
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
-
         outtake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
@@ -208,8 +223,12 @@ public class TurretTeleop extends OpMode {
 
         }
 
+
+
 /*        if (gamepad2.dpadDownWasPressed()) {
             switch (diverterDirection){
+
+
                 case LEFT:
                     diverterDirection = DiverterDirection.RIGHT;
                     diverter.setPosition(RIGHT_POSITION);
@@ -285,15 +304,12 @@ public class TurretTeleop extends OpMode {
         }
 
         if (gamepad1.x) {
-            Angle.setPower(0.5);
+            Aim.setPower(0.5);
         } else if (gamepad1.y) {
-            Angle.setPower(-0.5);
+            Aim.setPower(-0.5);
         } else {
-            Angle.setPower(0);
+            Aim.setPower(0);
         }
-
-
-
 
 
 

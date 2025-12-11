@@ -29,8 +29,8 @@
 
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
-import android.util.Size;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -43,6 +43,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -72,11 +73,14 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-@TeleOp(name = "Concept: AprilTag", group = "Concept")
+@TeleOp(name = "TeleBlue", group = "StarterBot")
 
-public class ConceptAprilTag extends LinearOpMode {
-    DcMotorEx motor;
-    CRServo servo;
+public class TeleV2 extends LinearOpMode {
+    DcMotor rightBackDrive, rightFrontDrive, leftFrontDrive, leftBackDrive;
+    DcMotorEx intake, outtake;
+    CRServo TurretServo, leftFeeder, rightFeeder;
+    Servo hood, kicker;
+
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
@@ -89,9 +93,13 @@ public class ConceptAprilTag extends LinearOpMode {
      * The variable to store our instance of the vision portal.
      */
     private VisionPortal visionPortal;
-
+    double leftFrontPower;
+    double rightFrontPower;
+    double leftBackPower;
+    double rightBackPower;
     @Override
     public void runOpMode() {
+
 
 
         initAprilTag();
@@ -101,16 +109,61 @@ public class ConceptAprilTag extends LinearOpMode {
         telemetry.addData(">", "Touch START to start OpMode");
         telemetry.update();
 
-        motor = hardwareMap.get(DcMotorEx.class, "outtake"); // tune this
-       // motor = hardwareMap.get(DcMotorEx.class, "CoreHex");
-      //  motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-      //  motor.setVelocityPIDFCoefficients(1.137743055555556, 0.1137743055555556, 0, 11.37743055555556);
-        motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(1.137743055555556, 0.1137743055555556, 0, 11.37743055555556));
+//        motor = hardwareMap.get(DcMotorEx.class, "outtake"); // tune this
+        // motor = hardwareMap.get(DcMotorEx.class, "CoreHex");
+        //  motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //  motor.setVelocityPIDFCoefficients(1.137743055555556, 0.1137743055555556, 0, 11.37743055555556);
 
-        servo = hardwareMap.get(CRServo.class, "Angle");
+        TurretServo = hardwareMap.get(CRServo.class, "turretservo");
+
+        kicker = hardwareMap.get(Servo.class, "kicker");
+
+        hood = hardwareMap.get(Servo.class, "hood");
+
+        leftFeeder = hardwareMap.get(CRServo.class, "leftFeeder");
+        rightFeeder = hardwareMap.get(CRServo.class, "rightFeeder");
+
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "LF");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "RF");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "LB");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "RB");
+
+        outtake = hardwareMap.get(DcMotorEx.class, "outtake");
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
+
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        outtake.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        outtake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        //        motor = hardwareMap.get(DcMotorEx.class, "outtake"); // tune this
+        // motor = hardwareMap.get(DcMotorEx.class, "CoreHex");
+        //  motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //  motor.setVelocityPIDFCoefficients(1.137743055555556, 0.1137743055555556, 0, 11.37743055555556);
+        outtake.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(1.137743055555556, 0.1137743055555556, 0, 11.37743055555556));
+
+
+        /*
+         * Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to
+         * slow down much faster when it is coasting. This creates a much more controllable
+         * drivetrain. As the robot stops much quicker.
+         */
+        leftFrontDrive.setZeroPowerBehavior(BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(BRAKE);
+        leftBackDrive.setZeroPowerBehavior(BRAKE);
+        rightBackDrive.setZeroPowerBehavior(BRAKE);
+        outtake.setZeroPowerBehavior(BRAKE);
+        intake.setZeroPowerBehavior(BRAKE);
 
 
         waitForStart();
+
 
         if (opModeIsActive()) {
 
@@ -125,14 +178,82 @@ public class ConceptAprilTag extends LinearOpMode {
 
                 // Save CPU resources; can resume streaming when needed.
                 if (gamepad1.dpad_down) {
+
                     visionPortal.stopStreaming();
                 } else if (gamepad1.dpad_up) {
                     visionPortal.resumeStreaming();
                 }
 
+
+
+                mecanumDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+
+
+                if (gamepad1.right_trigger > 0.2) {
+                    intake.setPower(1);
+
+                } else if (gamepad1.left_trigger > 0.2) {
+                    intake.setPower(-1);
+                } else {
+                    intake.setPower(0);
+                }
+
+                if (gamepad2.y) {
+                    outtake.setPower(-0.7);
+
+                } else if (gamepad2.b) { // stop flywheel
+                    outtake.setPower(0);
+
+                }
+
+                if (gamepad2.x) {
+                    outtake.setPower(0.7);
+                } else if (gamepad2.b) { // stop flywheel
+                    outtake.setPower(0);
+
+                }
+
+                if (gamepad2.a){
+                    kicker.setPosition(1);
+                } else {
+                    kicker.setPosition(0);
+
+                }
+
+
+                if (gamepad2.left_trigger > 0.2) {
+                    leftFeeder.setPower(1);
+
+                } else if (gamepad2.left_bumper) {
+                    leftFeeder.setPower(-0.5);
+                } else {
+                    leftFeeder.setPower(0);
+                }
+
+                if (gamepad2.right_trigger > 0.2) {
+                    rightFeeder.setPower(1);
+
+                } else if (gamepad2.left_bumper) {
+                    leftFeeder.setPower(-0.5);
+                } else {
+                    rightFeeder.setPower(0);
+                }
+
+
+
+
                 // Share the CPU.
                 sleep(20);
             }
+
+
+
+
+
+
+
+
+
         }
 
         // Save more CPU resources when camera is no longer needed.
@@ -238,28 +359,56 @@ public class ConceptAprilTag extends LinearOpMode {
         telemetry.addLine("RBE = Range, Bearing & Elevation");
 
         for (AprilTagDetection detection : currentDetections) {
+                if (detection.id == 20){
+                    double bearing = detection.ftcPose.bearing;
 
-            if (detection.id == 20) {
+                    if (bearing > 1){
+                        TurretServo.setPower(0.5);
+                    }
 
-                double bearing = detection.ftcPose.bearing;   // degrees left/right
+                    else if (bearing < -1){
+                        TurretServo.setPower(-0.5);
+                    }
 
-                // --- SIMPLE TURRET TRACKING ---
-                double deadzone = 2.0;     // ±2 degrees = centered
-                double turnPower = 0.4;    // CRServo speed
+                    else {
+                        TurretServo.setPower(0);
+                    }
 
-                if (bearing > deadzone) {
-                    // Target is RIGHT → turn turret RIGHT
-                    servo.setPower(turnPower);
+
+
                 }
-                else if (bearing < -deadzone) {
-                    // Target is LEFT → turn turret LEFT
-                    servo.setPower(-turnPower);
-                }
-                else {
-                    // Target centered → stop turret
-                    servo.setPower(0);
-                }
-            }
+
+
+//            if (gamepad1.right_trigger > 0.2) {
+//                intake.setPower(1);
+//
+//            } else if (gamepad1.left_trigger > 0.2) {
+//                intake.setPower(-1);
+//            } else {
+//                intake.setPower(0);
+//            }
+//
+//
+//            if (gamepad2.left_trigger > 0.2) {
+//                leftFeeder.setPower(1);
+//
+//            } else if (gamepad2.left_bumper) {
+//                leftFeeder.setPower(-0.5);
+//            } else {
+//                leftFeeder.setPower(0);
+//            }
+//
+//            if (gamepad2.right_trigger > 0.2) {
+//                rightFeeder.setPower(1);
+//
+//            } else if (gamepad2.left_bumper) {
+//                leftFeeder.setPower(-0.5);
+//            } else {
+//                rightFeeder.setPower(0);
+//            }
+//            mecanumDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+
+            /// ///////
 
 
 //            if (detection.id == 20) {
@@ -296,51 +445,63 @@ public class ConceptAprilTag extends LinearOpMode {
                 }*/
 
 
-
-
-
-
-
-
-
-
-            if (detection.id == 20){
-                double bearing = detection.ftcPose.bearing;
-                double distance = detection.ftcPose.range;  // inches
-
-                if (distance < 100) {
-                    motor.setPower(distance / 100 + 0.05); // tune both for curved scaling
-                    servo.setPower(distance / 150);
-                }
-                if (bearing > 0.3){
-                    servo.setPower(-0.5);
-                }
-
-                else if (bearing < -0.3){
-                    servo.setPower(0.5);
-                }
-
-                else {
-                    servo.setPower(0);
-                }
-
-
-
-            }
-
+//            if (detection.id == 20){
+//                double bearing = detection.ftcPose.bearing;
+//                double distance = detection.ftcPose.range;  // inches
+//
+//                if (distance < 100) {
+//                    motor.setPower(distance / 100 + 0.05); // tune both for curved scaling
+//                    servo.setPower(distance / 150);
+//                }
+//                if (bearing > 0.3){
+//                    servo.setPower(-0.5);
+//                }
+//
+//                else if (bearing < -0.3){
+//                    servo.setPower(0.5);
+//                }
+//
+//                else {
+//                    servo.setPower(0);
+//                }
+//
+//
+//
+//            }
 
 
         }
+
     }
 
 
+    void mecanumDrive(double forward, double strafe, double rotate) {
+
+        /* the denominator is the largest motor power (absolute value) or 1
+         * This ensures all the powers maintain the same ratio,
+         * but only if at least one is out of the range [-1, 1]
+         */
+        double denominator = Math.max(Math.abs(forward) + Math.abs(strafe) + Math.abs(rotate), 1);
+
+        leftFrontPower = (forward + strafe + rotate) / denominator;
+        rightFrontPower = (forward - strafe - rotate) / denominator;
+        leftBackPower = (forward - strafe + rotate) / denominator;
+        rightBackPower = (forward + strafe - rotate) / denominator;
+
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
+
+
+    }
+}
 
 
 
 
 
 
-        }
 
 
 
@@ -353,7 +514,11 @@ public class ConceptAprilTag extends LinearOpMode {
 
 
 
-      // end method telemetryAprilTag()
+
+
+
+
+// end method telemetryAprilTag()
 
 
 
