@@ -56,7 +56,7 @@ import java.util.List;
  * https://ftc-docs.firstinspires.org/en/latest/apriltag/vision_portal/apriltag_intro/apriltag-intro.html
  *
  * In this sample, any visible tag ID will be detected and displayed, but only tags that are included in the default
- * "TagLibrary" will have their position and orientation information displayed.  This default TagLibrary contains
+ * "TagLibrary" will have their      position and orientation information displayed.  This default TagLibrary contains
  * the current Season's AprilTags and a small set of "test Tags" in the high number range.
  *
  * When an AprilTag in the TagLibrary is detected, the SDK provides location and orientation of the tag, relative to the camera.

@@ -79,7 +79,7 @@ public class TeleV2 extends LinearOpMode {
     DcMotor rightBackDrive, rightFrontDrive, leftFrontDrive, leftBackDrive;
     DcMotorEx intake, outtake;
     CRServo TurretServo, leftFeeder, rightFeeder;
-    Servo hood, kicker;
+    Servo hood,  kicker;
 
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
