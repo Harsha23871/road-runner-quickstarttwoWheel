@@ -65,7 +65,7 @@ import java.util.List;
  * https://ftc-docs.firstinspires.org/apriltag-detection-values
  *
  * To experiment with using AprilTags to navigate, try out these two driving samples:
- * RobotAutoDriveToAprilTagOmni and RobotAutoDriveToAprilTagTank
+ * RobotAutoDriveToAprilTagOmni and R   obotAutoDriveToAprilTagTank
  *
  * There are many "default" VisionPortal and AprilTag configuration parameters that may be overridden if desired.
  * These default parameters are shown as comments in the code below.
