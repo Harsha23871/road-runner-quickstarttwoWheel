@@ -140,9 +140,9 @@ public class TurretTeleop extends OpMode  {
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        outtake.setDirection(DcMotorSimple.Direction.FORWARD);
-//        intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        outtake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        outtake.setDirection(DcMotorEx.Direction.FORWARD);
+       intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        outtake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
 
 
@@ -156,7 +156,7 @@ public class TurretTeleop extends OpMode  {
         leftBackDrive.setZeroPowerBehavior(BRAKE);
         rightBackDrive.setZeroPowerBehavior(BRAKE);
         outtake.setZeroPowerBehavior(BRAKE);
-//        intake.setZeroPowerBehavior(BRAKE);
+       intake.setZeroPowerBehavior(BRAKE);
 
 
         /*
@@ -241,26 +241,26 @@ public class TurretTeleop extends OpMode  {
             }
         }*/
 
-//        if (gamepad1.aWasPressed()){
-//            switch (intakeState){
-//                case ON:
-//                    intakeState = IntakeState.OFF;
-//                    intake.setPower(0);
-//                    break;
-//                case OFF:
-//                    intakeState = IntakeState.ON;
-//                    intake.setPower(1);
-//                    break;
-//            }
-//        }
-//        if (gamepad1.right_trigger > 0.2) {
-//            intake.setPower(1);
-//
-//        } else if (gamepad1.left_trigger > 0.2) {
-//            intake.setPower(-1);
-//        } else{
-//            intake.setPower(0);
-//        }
+        if (gamepad1.aWasPressed()){
+            switch (intakeState){
+                case ON:
+                    intakeState = IntakeState.OFF;
+                    intake.setPower(0);
+                    break;
+                case OFF:
+                    intakeState = IntakeState.ON;
+                    intake.setPower(1);
+                    break;
+            }
+        }
+        if (gamepad1.right_trigger > 0.2) {
+            intake.setPower(1);
+
+        } else if (gamepad1.left_trigger > 0.2) {
+            intake.setPower(-1);
+        } else{
+            intake.setPower(0);
+        }
 
 
 

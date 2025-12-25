@@ -1,16 +1,11 @@
-package org.firstinspires.ftc.teamcode;//package org.firstinspires.ftc.teamcode.tuning;
-import android.util.Size;
+package org.firstinspires.ftc.teamcode.TeleOp.Tests;//package org.firstinspires.ftc.teamcode.tuning;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import org.firstinspires.ftc.teamcode.TeleOp.AprilTagsWebCam;
-import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
 import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -21,60 +16,19 @@ import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.externalhardware.AprilWebcam;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Config
 @Autonomous(name = "TestPaths", group = "Autonomous")
 public class AutoTest extends LinearOpMode{
-AprilWebcam aprilWebcam = new AprilWebcam();
-
-
-    public class AprilTagsExample extends OpMode {
-
-        AprilTagsWebCam aprilTagsWebCam = new AprilTagsWebCam();
-
-        @Override
-        public void init(){
-            aprilTagsWebCam.init(hardwareMap, telemetry);
-
-        }
-
-        @Override
-        public void loop(){
-//update the vision portal
-            aprilTagsWebCam.update();
-            AprilTagDetection id20 = aprilTagsWebCam.getTagBySpecificId(20);
-            telemetry.addData("id20 String", id20.toString());
-
-
-
-
-
-        }
-
-
-
-    }
 
 
     public class Intake {
@@ -107,12 +61,13 @@ AprilWebcam aprilWebcam = new AprilWebcam();
         }
     }
     public class Shooter {
-        private DcMotor shooter;
+        private DcMotor outtake;
 
         public Shooter(HardwareMap hardwareMap) {
-            shooter = hardwareMap.get(DcMotor.class, "Shooter");
-            shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            shooter.setDirection(DcMotorSimple.Direction.FORWARD);
+            outtake = hardwareMap.get(DcMotor.class, "outtake");
+            outtake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            outtake.setDirection(DcMotor.Direction.FORWARD);
+            outtake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         }
         public class ShooterOut implements Action{
@@ -120,12 +75,12 @@ AprilWebcam aprilWebcam = new AprilWebcam();
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    shooter.setPower(0.8);
+                    outtake.setPower(0.8);
                     initialized = true;
                     return true;
                 }
                 else {
-                   shooter.setPower(0);
+                    outtake.setPower(0);
                     return false;
                 }
 
@@ -194,13 +149,13 @@ AprilWebcam aprilWebcam = new AprilWebcam();
     }
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-144, 0, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
 
-        Intake intake = new Intake(hardwareMap);
+       // Intake intake = new Intake(hardwareMap);
         Shooter shooter = new Shooter(hardwareMap);
-        Feeder
-                feeder = new Feeder(hardwareMap);
+//        Feeder
+//                feeder = new Feeder(hardwareMap);
 
 
 
@@ -209,20 +164,21 @@ AprilWebcam aprilWebcam = new AprilWebcam();
 
 
                 TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                        .turn(45)
+//                        .turn(45)
                         .lineToYConstantHeading(25)
                         .waitSeconds(1);
 
-                TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose)
+
+            /*    TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose)
                         .turn(45)
                          .lineToYConstantHeading(25)
                         .waitSeconds(1);
                 TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)
                         .turn(45)
                         .lineToYConstantHeading(25)
-                        .waitSeconds(1);
+                        .waitSeconds(1);*/
         Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
-                .strafeTo(new Vector2d(48, 12))
+                .lineToYConstantHeading(0)
                 .build();
 
 
@@ -237,19 +193,20 @@ AprilWebcam aprilWebcam = new AprilWebcam();
                  if (startPosition == 1) {
                 trajectoryActionChosen = tab1.build();
                } else if (startPosition == 2) {
-                     trajectoryActionChosen = tab2.build();
+                     trajectoryActionChosen = tab1.build();
                  } else {
-                   trajectoryActionChosen = tab3.build();
+                   trajectoryActionChosen = tab1.build();
 
 
                  }
                       Actions.runBlocking(
                               new SequentialAction(
-                                       intake.intakeIn(),
-                                      shooter.ShootOut(),
+
+
 
                               trajectoryActionChosen,
-                              trajectoryActionCloseOut
+                              trajectoryActionCloseOut,
+                                      shooter.ShootOut()
 
 
 
