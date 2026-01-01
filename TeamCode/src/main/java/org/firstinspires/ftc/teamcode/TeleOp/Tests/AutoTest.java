@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.TeleOp.Tests;//package org.firstinspires.ftc.teamcode.tuning;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.TeleOp.AprilTagsWebCam;
@@ -21,6 +22,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+
 import org.firstinspires.ftc.robotcontroller.external.samples.externalhardware.AprilWebcam;
 
 
@@ -32,12 +34,12 @@ public class AutoTest extends LinearOpMode{
 
 
     public class Intake {
-        private DcMotor intake;
+        private DcMotorEx intake;
 
         public Intake(HardwareMap hardwareMap) {
-            intake = hardwareMap.get(DcMotor.class, "Intake");
-            intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            intake.setDirection(DcMotorSimple.Direction.FORWARD);
+            intake = hardwareMap.get(DcMotorEx.class, "intake");
+            intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            intake.setDirection(DcMotorEx.Direction.FORWARD);
 
         }
         public class IntakeIn implements Action{
@@ -47,6 +49,12 @@ public class AutoTest extends LinearOpMode{
                 if (!initialized) {
                     intake.setPower(0.8);
                     initialized = true;
+
+                }
+
+                double speedi = intake.getVelocity();
+                packet.put("intakeSpeed",speedi);
+                if( speedi < 49){
                     return true;
                 }
                 else {
@@ -61,13 +69,13 @@ public class AutoTest extends LinearOpMode{
         }
     }
     public class Shooter {
-        private DcMotor outtake;
+        private DcMotorEx outtake;
 
         public Shooter(HardwareMap hardwareMap) {
-            outtake = hardwareMap.get(DcMotor.class, "outtake");
-            outtake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            outtake.setDirection(DcMotor.Direction.FORWARD);
-            outtake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            outtake = hardwareMap.get(DcMotorEx.class, "outtake");
+            outtake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            outtake.setDirection(DcMotorEx.Direction.FORWARD);
+            outtake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
         }
         public class ShooterOut implements Action{
@@ -77,6 +85,12 @@ public class AutoTest extends LinearOpMode{
                 if (!initialized) {
                     outtake.setPower(0.8);
                     initialized = true;
+
+                }
+
+                double speedOuttake = outtake.getVelocity();
+                packet.put("outtakeSpeed",speedOuttake);
+                if( speedOuttake < 49){
                     return true;
                 }
                 else {
@@ -149,10 +163,10 @@ public class AutoTest extends LinearOpMode{
     }
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(35, 60, Math.toRadians(-90));
         MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
 
-       // Intake intake = new Intake(hardwareMap);
+       Intake intake = new Intake(hardwareMap);
         Shooter shooter = new Shooter(hardwareMap);
 //        Feeder
 //                feeder = new Feeder(hardwareMap);
@@ -165,8 +179,27 @@ public class AutoTest extends LinearOpMode{
 
                 TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
 //                        .turn(45)
-                        .lineToYConstantHeading(25)
-                        .waitSeconds(1);
+                        .lineToYConstantHeading(35);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//                        .lineToYConstantHeading(25)
 
 
             /*    TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose)
@@ -178,7 +211,8 @@ public class AutoTest extends LinearOpMode{
                         .lineToYConstantHeading(25)
                         .waitSeconds(1);*/
         Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
-                .lineToYConstantHeading(0)
+                .lineToYConstantHeading(7)
+                .lineToXConstantHeading(60)
                 .build();
 
 
@@ -201,11 +235,11 @@ public class AutoTest extends LinearOpMode{
                  }
                       Actions.runBlocking(
                               new SequentialAction(
-
-
-
+                                      intake.intakeIn(),
                               trajectoryActionChosen,
+                              shooter.ShootOut(),
                               trajectoryActionCloseOut,
+
                                       shooter.ShootOut()
 
 
