@@ -39,31 +39,34 @@ public class AutoTest extends LinearOpMode{
         public Intake(HardwareMap hardwareMap) {
             intake = hardwareMap.get(DcMotorEx.class, "intake");
             intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            intake.setDirection(DcMotorEx.Direction.FORWARD);
+            intake.setDirection(DcMotorEx.Direction.REVERSE);
 
         }
-        public class IntakeIn implements Action{
+        public class IntakeIn implements Action {
             private boolean initialized = false;
+            private long startTime;
+            private final long runTimeMs = 1000; // 1 second (change this)
+
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     intake.setPower(0.8);
+                    startTime = System.currentTimeMillis();
                     initialized = true;
-
                 }
 
-                double speedi = intake.getVelocity();
-                packet.put("intakeSpeed",speedi);
-                if( speedi < 49){
-                    return true;
-                }
-                else {
-                     intake.setPower(0);
-                        return false;
-                }
+                long elapsed = System.currentTimeMillis() - startTime;
+                packet.put("intakeTimeMs", elapsed);
 
+                if (elapsed < runTimeMs) {
+                    return true; // keep running
+                } else {
+                    intake.setPower(0);
+                    return false; // action finished
+                }
             }
         }
+
         public Action intakeIn() {
             return new IntakeIn();
         }
@@ -163,7 +166,7 @@ public class AutoTest extends LinearOpMode{
     }
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(35, 60, Math.toRadians(-90));
+        Pose2d initialPose = new Pose2d(-43, 67, Math.toRadians(0));
         MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
 
        Intake intake = new Intake(hardwareMap);
@@ -177,9 +180,8 @@ public class AutoTest extends LinearOpMode{
 
 
 
-                TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-//                        .turn(45)
-                        .lineToYConstantHeading(35);
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
+                .lineToXConstantHeading(40);
 
 
 
@@ -211,8 +213,8 @@ public class AutoTest extends LinearOpMode{
                         .lineToYConstantHeading(25)
                         .waitSeconds(1);*/
         Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
-                .lineToYConstantHeading(7)
-                .lineToXConstantHeading(60)
+//                .lineToXConstantHeading(7)
+//                .lineToXConstantHeading(60)
                 .build();
 
 
@@ -235,10 +237,12 @@ public class AutoTest extends LinearOpMode{
                  }
                       Actions.runBlocking(
                               new SequentialAction(
-                                      intake.intakeIn(),
+                                      //intake.intakeIn(),
+
+
                               trajectoryActionChosen,
-                              shooter.ShootOut(),
-                              trajectoryActionCloseOut,
+                              //shooter.ShootOut(),
+                             // trajectoryActionCloseOut,
 
                                       shooter.ShootOut()
 
