@@ -6,10 +6,10 @@ java {
     targetCompatibility JavaVersion.VERSION_11
 }
 repositories {
-
-    maven{ url = 'https://maven.brott.dev/'}
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://maven.brott.dev/' }
 }
-dependencies {
 
-     implementation  'com.acmerobotics.roadrunner:MeepMeep:0.1.7'
+dependencies {
+    implementation 'com.github.rh-robotics:MeepMeep:v1.1.0'
 }
