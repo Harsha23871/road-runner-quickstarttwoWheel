@@ -116,7 +116,7 @@ public class TurretTeleop extends OpMode  {
         leftLaunchState = LaunchState.IDLE;
         rightLaunchState = LaunchState.IDLE;
 
-        ConceptAprilTag.init();
+//        ConceptAprilTag.init();
         leftFrontDrive = hardwareMap.get(DcMotor.class, "LF");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "RF");
         leftBackDrive = hardwareMap.get(DcMotor.class, "LB");

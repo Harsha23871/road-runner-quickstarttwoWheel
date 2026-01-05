@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp.Tests;//package org.firstinspires.ftc.teamcode.tuning;
 
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -45,7 +46,7 @@ public class AutoTest extends LinearOpMode{
         public class IntakeIn implements Action {
             private boolean initialized = false;
             private long startTime;
-            private final long runTimeMs = 1000; // 1 second (change this)
+            private final long runTimeMs = 4000; // 1 second (change this)
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
@@ -71,6 +72,7 @@ public class AutoTest extends LinearOpMode{
             return new IntakeIn();
         }
     }
+
     public class Shooter {
         private DcMotorEx outtake;
 
@@ -81,26 +83,28 @@ public class AutoTest extends LinearOpMode{
             outtake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
         }
-        public class ShooterOut implements Action{
+        public class ShooterOut implements Action {
             private boolean initialized = false;
+            private long startTime;
+            private final long runTimeMs = 4000; // 1 second (change this)
+
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setPower(0.8);
+                    outtake.setPower(-0.8);
+                    startTime = System.currentTimeMillis();
                     initialized = true;
-
                 }
 
-                double speedOuttake = outtake.getVelocity();
-                packet.put("outtakeSpeed",speedOuttake);
-                if( speedOuttake < 49){
-                    return true;
-                }
-                else {
+                long elapsed = System.currentTimeMillis() - startTime;
+                packet.put("intakeTimeMs", elapsed);
+
+                if (elapsed < runTimeMs) {
+                    return true; // keep running
+                } else {
                     outtake.setPower(0);
-                    return false;
+                    return false; // action finished
                 }
-
             }
         }
         public Action ShootOut() {
@@ -166,7 +170,7 @@ public class AutoTest extends LinearOpMode{
     }
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-43, 67, Math.toRadians(0));
+        Pose2d initialPose = new Pose2d(-61, 20, Math.toRadians(0));
         MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
 
        Intake intake = new Intake(hardwareMap);
@@ -181,22 +185,8 @@ public class AutoTest extends LinearOpMode{
 
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .lineToXConstantHeading(40);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                .strafeToConstantHeading(new Vector2d(-12,25))
+                .turn(Math.toRadians(90));
 
 
 
@@ -213,8 +203,9 @@ public class AutoTest extends LinearOpMode{
                         .lineToYConstantHeading(25)
                         .waitSeconds(1);*/
         Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
-//                .lineToXConstantHeading(7)
-//                .lineToXConstantHeading(60)
+                .strafeToConstantHeading(new Vector2d(-12,40))
+                .strafeToConstantHeading(new Vector2d(-12,25))
+                .turn(Math.toRadians(-45))
                 .build();
 
 
@@ -235,22 +226,56 @@ public class AutoTest extends LinearOpMode{
 
 
                  }
+
+        Actions.runBlocking(
+                new SequentialAction(
+                        shooter.ShootOut()
+                )
+        );
+
+               Actions.runBlocking(
+                new ParallelAction(
+                        shooter.ShootOut(),
+                        intake.intakeIn()
+
+                ));
+
+
+
                       Actions.runBlocking(
                               new SequentialAction(
-                                      //intake.intakeIn(),
+                              trajectoryActionChosen
 
 
-                              trajectoryActionChosen,
-                              //shooter.ShootOut(),
-                             // trajectoryActionCloseOut,
-
-                                      shooter.ShootOut()
 
 
 
 
                       )
                       );
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        intake.intakeIn(),
+                        trajectoryActionCloseOut
+
+
+                ));
+        Actions.runBlocking(
+                new SequentialAction(
+                        shooter.ShootOut()
+
+
+                ));
+        Actions.runBlocking(
+                new ParallelAction(
+                        shooter.ShootOut(),
+                        intake.intakeIn()
+
+
+                ));
+
+
 
 
 
