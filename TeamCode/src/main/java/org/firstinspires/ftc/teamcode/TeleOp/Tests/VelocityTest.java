@@ -16,7 +16,7 @@ public class VelocityTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        motor = hardwareMap.get(DcMotorEx.class, "CoreHex");
+        motor = hardwareMap.get(DcMotorEx.class, "outtake");
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         waitForStart();
 

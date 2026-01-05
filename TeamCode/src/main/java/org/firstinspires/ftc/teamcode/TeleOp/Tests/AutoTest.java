@@ -22,6 +22,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 
 import org.firstinspires.ftc.robotcontroller.external.samples.externalhardware.AprilWebcam;
@@ -43,10 +44,10 @@ public class AutoTest extends LinearOpMode{
             intake.setDirection(DcMotorEx.Direction.REVERSE);
 
         }
-        public class IntakeIn implements Action {
+        public class IntakeInLong implements Action {
             private boolean initialized = false;
             private long startTime;
-            private final long runTimeMs = 4000; // 1 second (change this)
+            private final long runTimeMs = 3000; // 1 second (change this)
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
@@ -69,9 +70,10 @@ public class AutoTest extends LinearOpMode{
         }
 
         public Action intakeIn() {
-            return new IntakeIn();
+            return new IntakeInLong();
         }
     }
+
 
     public class Shooter {
         private DcMotorEx outtake;
@@ -81,12 +83,13 @@ public class AutoTest extends LinearOpMode{
             outtake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             outtake.setDirection(DcMotorEx.Direction.FORWARD);
             outtake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+//            outtake.setVelocityPIDFCoefficients(1.489409090909091, 0.1489409090909091, 0, 14.89409090909091);
 
         }
         public class ShooterOut implements Action {
             private boolean initialized = false;
             private long startTime;
-            private final long runTimeMs = 4000; // 1 second (change this)
+            private final long runTimeMs = 3000; // 1 second (change this)
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
@@ -170,7 +173,7 @@ public class AutoTest extends LinearOpMode{
     }
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-61, 20, Math.toRadians(0));
+        Pose2d initialPose = new Pose2d(-61, 20, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
 
        Intake intake = new Intake(hardwareMap);
@@ -185,8 +188,7 @@ public class AutoTest extends LinearOpMode{
 
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .strafeToConstantHeading(new Vector2d(-12,25))
-                .turn(Math.toRadians(90));
+                .strafeToConstantHeading(new Vector2d(-12,25));
 
 
 
@@ -205,7 +207,23 @@ public class AutoTest extends LinearOpMode{
         Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(-12,40))
                 .strafeToConstantHeading(new Vector2d(-12,25))
+                .turn(Math.toRadians(45))
+                .build();
+        Action trajectoryActionCloseout2 = tab1.endTrajectory().fresh()
                 .turn(Math.toRadians(-45))
+                .strafeToConstantHeading(new Vector2d(12,25))
+//                .strafeToConstantHeading(new Vector2d(12,40))
+//                .strafeToConstantHeading(new Vector2d(-12,20))
+//                .turn(Math.toRadians(-45))
+
+
+                .build();
+        Action trajectoryActionCloseout3 = tab1.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(12,40))
+                .strafeToConstantHeading(new Vector2d(-12,20))
+                .turn(Math.toRadians(45))
+
+
                 .build();
 
 
@@ -267,6 +285,7 @@ public class AutoTest extends LinearOpMode{
 
 
                 ));
+
         Actions.runBlocking(
                 new ParallelAction(
                         shooter.ShootOut(),
@@ -274,6 +293,28 @@ public class AutoTest extends LinearOpMode{
 
 
                 ));
+        Actions.runBlocking(
+                new SequentialAction(
+                        trajectoryActionCloseout2
+
+                )
+
+
+
+        );
+        Actions.runBlocking(
+                new ParallelAction(
+                      intake.intakeIn(),
+                        trajectoryActionCloseout3
+                )
+        );
+        Actions.runBlocking(
+                new ParallelAction(
+                        intake.intakeIn(),
+                        shooter.ShootOut()
+
+                )
+        );
 
 
 

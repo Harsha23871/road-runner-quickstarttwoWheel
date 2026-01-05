@@ -26,11 +26,11 @@ public class ShootingConsistencyTest extends LinearOpMode {
 
     public static double TESTING_SPEED = 0.9 * MOTOR_MAX_RPM;
 
-    public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(1.137743055555556, 0.1137743055555556, 0, 11.37743055555556);
+    public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(1.489409090909091, 0.1489409090909091, 0, 14.89409090909091);
 
-    private double lastKp = 1.137743055555556;
-    private double lastKi = 0.1137743055555556;
-    private double lastKd = 11.37743055555556;
+    private double lastKp = 1.489409090909091;
+    private double lastKi = 0.1489409090909091;
+    private double lastKd = 0   ;
     private double lastKf = getMotorVelocityF();
 
     private FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -40,7 +40,7 @@ public class ShootingConsistencyTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // Change my id
-        DcMotorEx myMotor = hardwareMap.get(DcMotorEx.class, "CoreHex");
+        DcMotorEx myMotor = hardwareMap.get(DcMotorEx.class, "outtake");
         myMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         myMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
