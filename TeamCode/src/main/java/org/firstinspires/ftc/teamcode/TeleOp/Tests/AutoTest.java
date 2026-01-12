@@ -23,9 +23,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
-import org.firstinspires.ftc.robotcontroller.external.samples.externalhardware.AprilWebcam;
+
 
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -114,65 +115,71 @@ public class AutoTest extends LinearOpMode{
             return new ShooterOut();
         }
     }
-    public class Feeder {
-        private CRServo rightFeeder;
-        private CRServo leftFeeder;
+    public class Gate {
+        private Servo Gate;
 
-        public Feeder(HardwareMap hardwareMap) {
-            leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
-            rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
+        public Gate(HardwareMap hardwareMap) {
+            Gate = hardwareMap.get(Servo.class, "gate");
+
+
         }
 
 
-        public class leftFeed implements Action {
-
-            private boolean initialized = false;
-
+        public class CloseGate implements Action {
+            @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-
-             if (!initialized) {
-                 leftFeeder.setPower(1);
-                 initialized = true;
-                 return true;
-             } else {
-                 leftFeeder.setPower(0);
-                 return false;
-             }
-            }
-
-            public Action feedLeft() {
-                return new leftFeed();
+                Gate.setPosition(0.55);
+                return false;
             }
         }
 
-        public class rightFeed implements Action {
-            private boolean initialized = false;
+        public Action closegate() {
+            return new CloseGate();
+        }
 
+
+        public class OpenGate implements Action {
+            @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-
-                if (!initialized) {
-                    rightFeeder.setPower(1);
-                    initialized = true;
-                    return true;
-                } else {
-                    rightFeeder.setPower(0);
-                    return false;
-                }
-            }
-            public Action feedRight() {
-                return new rightFeed();
+                Gate.setPosition(1);
+                return false;
             }
         }
 
+        public Action opengate() {
+            return new OpenGate();
+        }
 
 
+    }
+    public class TurretTurn {
+        private Servo TurretTurn;
+
+        public TurretTurn(HardwareMap hardwareMap) {
+            TurretTurn = hardwareMap.get(Servo.class, "gate");
 
 
+        }
+
+        public class TurretTurnShootingPOS implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                TurretTurn.setPosition(1);
+                return false;
+            }
+        }
+
+        public Action TurretTurnShootingPOS() {
+            return new TurretTurnShootingPOS();
+        }
 
 
     }
 
-    public void runOpMode() throws InterruptedException {
+
+
+
+        public void runOpMode() throws InterruptedException {
         Pose2d initialPose = new Pose2d(-61, 20, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
 
@@ -188,12 +195,13 @@ public class AutoTest extends LinearOpMode{
 
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .strafeToConstantHeading(new Vector2d(-12,25));
+                .setTangent(0)
+                .splineToConstantHeading(new Vector2d(-12, 25), Math.PI / 2);
 
 
+                //9 ball path
 
 
-//                        .lineToYConstantHeading(25)
 
 
             /*    TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose)
@@ -205,14 +213,14 @@ public class AutoTest extends LinearOpMode{
                         .lineToYConstantHeading(25)
                         .waitSeconds(1);*/
         Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-12,40))
-                .strafeToConstantHeading(new Vector2d(-12,25))
+                .strafeToConstantHeading(new Vector2d(-12,40))//dont make spline
+                .splineToConstantHeading(new Vector2d(-12, 20), Math.PI / 2)
                 .turn(Math.toRadians(45))
                 .build();
         Action trajectoryActionCloseout2 = tab1.endTrajectory().fresh()
                 .turn(Math.toRadians(-45))
-                .strafeToConstantHeading(new Vector2d(12,25))
-//                .strafeToConstantHeading(new Vector2d(12,40))
+                .setTangent(5)
+                .splineToConstantHeading(new Vector2d(12,25),Math.PI/2)
 //                .strafeToConstantHeading(new Vector2d(-12,20))
 //                .turn(Math.toRadians(-45))
 
@@ -220,10 +228,9 @@ public class AutoTest extends LinearOpMode{
                 .build();
         Action trajectoryActionCloseout3 = tab1.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(12,40))
-                .strafeToConstantHeading(new Vector2d(-12,20))
+                .setTangent(1)
+                .splineToConstantHeading(new Vector2d(-12, 20), Math.PI / 2)
                 .turn(Math.toRadians(45))
-
-
                 .build();
 
 
@@ -326,6 +333,7 @@ public class AutoTest extends LinearOpMode{
 
 
     }
+
 
 //                        .splineToConstantHeading(new Vector2d(42, 40), Math.toRadians(180))
 //                        .splineToConstantHeading(new Vector2d (10,55),Math.toRadians(270))
