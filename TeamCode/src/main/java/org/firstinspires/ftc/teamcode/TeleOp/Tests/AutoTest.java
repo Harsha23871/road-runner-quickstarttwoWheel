@@ -123,8 +123,6 @@ public class AutoTest extends LinearOpMode{
 
 
         }
-
-
         public class CloseGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
@@ -133,7 +131,7 @@ public class AutoTest extends LinearOpMode{
             }
         }
 
-        public Action closegate() {
+        public Action closeGate() {
             return new CloseGate();
         }
 
@@ -146,7 +144,7 @@ public class AutoTest extends LinearOpMode{
             }
         }
 
-        public Action opengate() {
+        public Action openGate() {
             return new OpenGate();
         }
 
@@ -185,6 +183,7 @@ public class AutoTest extends LinearOpMode{
 
        Intake intake = new Intake(hardwareMap);
         Shooter shooter = new Shooter(hardwareMap);
+        Gate gate = new Gate(hardwareMap);
 //        Feeder
 //                feeder = new Feeder(hardwareMap);
 
@@ -194,7 +193,7 @@ public class AutoTest extends LinearOpMode{
 
 
 
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
+        TrajectoryActionBuilder firstscore = drive.actionBuilder(initialPose)
                 .strafeToConstantHeading(new Vector2d(-10, 10));
 
 
@@ -211,34 +210,33 @@ public class AutoTest extends LinearOpMode{
                         .turn(45)
                         .lineToYConstantHeading(25)
                         .waitSeconds(1);*/
-        Action IntakeRow1 = tab1.endTrajectory().fresh()
+        Action IntakeRow1 = firstscore.endTrajectory().fresh()
                 .turnTo(Math.toRadians(90))
                 .strafeToConstantHeading(new Vector2d(-10, 48))
                 .build();
-        Action ShootRow1 = tab1.endTrajectory().fresh()
+        Action ShootRow1 = firstscore.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(-10, 10))
 //                .strafeToConstantHeading(new Vector2d(-12,20))
 //                .turn(Math.toRadians(-45))
 
 
                 .build();
-        Action IntakeRowTwo = tab1.endTrajectory().fresh()
+        Action IntakeRowTwo = firstscore.endTrajectory().fresh()
                 .setTangent(Math.toRadians(20))
                 .splineToConstantHeading(new Vector2d(12, 48), Math.PI/2)
                 .build();
-            Action ComebackToShootRowTwo = tab1.endTrajectory().fresh()
+            Action ComebackToShootRowTwo = firstscore.endTrajectory().fresh()
                     .setTangent(5)
                     .splineToConstantHeading(new Vector2d(-10, 10), Math.PI/2)
                     .build();
 
-            Action IntakeRowThree = tab1.endTrajectory().fresh()
+            Action IntakeRowThree = firstscore.endTrajectory().fresh()
                     .setTangent(Math.toRadians(20))
                     .splineToConstantHeading(new Vector2d(36, 48), Math.PI/2)
                     .build();
-            Action ComebackToShootRowThree = tab1.endTrajectory().fresh()
+            Action ComebackToShootRowThree = firstscore.endTrajectory().fresh()
                     .setTangent(5)
                     .splineToConstantHeading(new Vector2d(-10, 10), Math.PI/2)
-
                     .build();
 
 
@@ -253,11 +251,11 @@ public class AutoTest extends LinearOpMode{
 
                Action trajectoryActionChosen;
                  if (startPosition == 1) {
-                trajectoryActionChosen = tab1.build();
+                trajectoryActionChosen = firstscore.build();
                } else if (startPosition == 2) {
-                     trajectoryActionChosen = tab1.build();
+                     trajectoryActionChosen = firstscore.build();
                  } else {
-                   trajectoryActionChosen = tab1.build();
+                   trajectoryActionChosen = firstscore.build();
 
 
                  }
@@ -283,12 +281,14 @@ public class AutoTest extends LinearOpMode{
 
         Actions.runBlocking(
                 new ParallelAction(
+                        gate.closeGate(),
                         intake.intakeIn(),
                         IntakeRow1
 
                 ));
             Actions.runBlocking(
                     new SequentialAction(
+                            gate.openGate(),
                             ShootRow1
                     ));
         Actions.runBlocking(
@@ -307,6 +307,7 @@ public class AutoTest extends LinearOpMode{
                 ));
         Actions.runBlocking(
                 new ParallelAction(
+                        gate.closeGate(),
                       intake.intakeIn(),
                         IntakeRowTwo
                 )
@@ -318,6 +319,7 @@ public class AutoTest extends LinearOpMode{
 
             Actions.runBlocking(
                     new SequentialAction(
+                            gate.openGate(),
                             shooter.ShootOut()
 
 
