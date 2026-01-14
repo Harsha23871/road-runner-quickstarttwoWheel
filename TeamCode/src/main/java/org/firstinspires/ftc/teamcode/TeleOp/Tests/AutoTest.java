@@ -154,7 +154,7 @@ public class AutoTest extends LinearOpMode{
         private Servo TurretTurn;
 
         public TurretTurn(HardwareMap hardwareMap) {
-            TurretTurn = hardwareMap.get(Servo.class, "gate");
+            TurretTurn = hardwareMap.get(Servo.class, "turret");
 
 
         }
@@ -184,6 +184,8 @@ public class AutoTest extends LinearOpMode{
        Intake intake = new Intake(hardwareMap);
         Shooter shooter = new Shooter(hardwareMap);
         Gate gate = new Gate(hardwareMap);
+        TurretTurn turretTurn = new TurretTurn(hardwareMap);
+
 //        Feeder
 //                feeder = new Feeder(hardwareMap);
 
@@ -281,6 +283,7 @@ public class AutoTest extends LinearOpMode{
 
         Actions.runBlocking(
                 new ParallelAction(
+                        turretTurn.TurretTurnShootingPOS(),
                         gate.closeGate(),
                         intake.intakeIn(),
                         IntakeRow1
