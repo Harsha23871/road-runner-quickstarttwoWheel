@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode.TeleOp.Tests;//package org.firstinspires.ftc.teamcode.tuning;
 
+
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+
 import org.firstinspires.ftc.teamcode.TeleOp.AprilTagsWebCam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
 
 import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
@@ -28,108 +31,32 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 
-
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+
 
 @Config
 @Autonomous(name = "TestPaths", group = "Autonomous")
-public class AutoTest extends LinearOpMode{
+public class AutoTest extends LinearOpMode {
 
 
-    public class Intake {
-        private DcMotorEx intake;
-
-        public Intake(HardwareMap hardwareMap) {
-            intake = hardwareMap.get(DcMotorEx.class, "intake");
-            intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            intake.setDirection(DcMotorEx.Direction.REVERSE);
-
-        }
-        public class IntakeInLong implements Action {
-            private boolean initialized = false;
-            private long startTime;
-            private final long runTimeMs = 3000; // 1 second (change this)
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    intake.setPower(0.8);
-                    startTime = System.currentTimeMillis();
-                    initialized = true;
-                }
-
-                long elapsed = System.currentTimeMillis() - startTime;
-                packet.put("intakeTimeMs", elapsed);
-
-                if (elapsed < runTimeMs) {
-                    return true; // keep running
-                } else {
-                    intake.setPower(0);
-                    return false; // action finished
-                }
-            }
-        }
-
-        public Action intakeIn() {
-            return new IntakeInLong();
-        }
-    }
-
-
-    public class Shooter {
-        private DcMotorEx outtake;
-
-        public Shooter(HardwareMap hardwareMap) {
-            outtake = hardwareMap.get(DcMotorEx.class, "outtake");
-            outtake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            outtake.setDirection(DcMotorEx.Direction.FORWARD);
-            outtake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-//            outtake.setVelocityPIDFCoefficients(1.489409090909091, 0.1489409090909091, 0, 14.89409090909091);
-
-        }
-        public class ShooterOut implements Action {
-            private boolean initialized = false;
-            private long startTime;
-            private final long runTimeMs = 3000; // 1 second (change this)
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    outtake.setPower(-0.8);
-                    startTime = System.currentTimeMillis();
-                    initialized = true;
-                }
-
-                long elapsed = System.currentTimeMillis() - startTime;
-                packet.put("intakeTimeMs", elapsed);
-
-                if (elapsed < runTimeMs) {
-                    return true; // keep running
-                } else {
-                    outtake.setPower(0);
-                    return false; // action finished
-                }
-            }
-        }
-        public Action ShootOut() {
-            return new ShooterOut();
-        }
-    }
     public class Gate {
         private Servo Gate;
+
 
         public Gate(HardwareMap hardwareMap) {
             Gate = hardwareMap.get(Servo.class, "gate");
 
 
         }
+
         public class CloseGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0.55);
+                Gate.setPosition(0.1);
                 return false;
             }
         }
+
 
         public Action closeGate() {
             return new CloseGate();
@@ -139,10 +66,11 @@ public class AutoTest extends LinearOpMode{
         public class OpenGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(1);
+                Gate.setPosition(0);
                 return false;
             }
         }
+
 
         public Action openGate() {
             return new OpenGate();
@@ -150,201 +78,407 @@ public class AutoTest extends LinearOpMode{
 
 
     }
-    public class TurretTurn {
-        private Servo TurretTurn;
 
-        public TurretTurn(HardwareMap hardwareMap) {
-            TurretTurn = hardwareMap.get(Servo.class, "turret");
+    public class Hood {
+        private Servo Hood;
+
+
+        public Hood(HardwareMap hardwareMap) {
+            Hood = hardwareMap.get(Servo.class, "hood");
 
 
         }
 
-        public class TurretTurnShootingPOS implements Action {
+
+        public class HoodActivation implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                TurretTurn.setPosition(1);
+                Hood.setPosition(0.6);
                 return false;
             }
         }
 
-        public Action TurretTurnShootingPOS() {
-            return new TurretTurnShootingPOS();
+
+        public Action HoodActivation() {
+            return new HoodActivation();
         }
-
-
     }
 
 
+        public class TurretTurn {
+            private Servo TurretTurn;
+
+
+            public TurretTurn(HardwareMap hardwareMap) {
+                TurretTurn = hardwareMap.get(Servo.class, "turretservo");
+
+
+            }
+
+
+            public class TurretTurnShootingPOS implements Action {
+                @Override
+                public boolean run(@NonNull TelemetryPacket packet) {
+                    TurretTurn.setPosition(1);
+                    return false;
+                }
+            }
+
+
+            public Action TurretTurnShootingPOS() {
+                return new TurretTurnShootingPOS();
+            }
+
+
+        }
+
+        public class Intake {
+            private DcMotorEx intake;
+
+
+            public Intake(HardwareMap hardwareMap) {
+                intake = hardwareMap.get(DcMotorEx.class, "intake");
+                intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+                intake.setDirection(DcMotorEx.Direction.REVERSE);
+
+
+            }
+
+            public class IntakeInLong implements Action {
+                private boolean initialized = false;
+                private long startTime;
+                private final long runTimeMs = 3000; // 1 second (change this)
+
+
+                @Override
+                public boolean run(@NonNull TelemetryPacket packet) {
+                    if (!initialized) {
+                        intake.setPower(0.7);
+                        startTime = System.currentTimeMillis();
+                        initialized = true;
+                    }
+
+
+                    long elapsed = System.currentTimeMillis() - startTime;
+                    packet.put("intakeTimeMs", elapsed);
+
+
+                    if (elapsed < runTimeMs) {
+                        return true; // keep running
+                    } else {
+                        intake.setPower(0);
+                        return false; // action finished
+                    }
+                }
+            }
+
+
+            public Action intakeIn() {
+                return new IntakeInLong();
+            }
+        }
+
+
+        public class Shooter {
+            private DcMotorEx outtake;
+            private DcMotorEx outtake2;
+
+
+            public Shooter(HardwareMap hardwareMap) {
+                outtake = hardwareMap.get(DcMotorEx.class, "outtake");
+                outtake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+                outtake.setDirection(DcMotorEx.Direction.FORWARD);
+                outtake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
+
+                outtake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
+                outtake2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+                outtake2.setDirection(DcMotorEx.Direction.FORWARD);
+                outtake2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+//            outtake.setVelocityPIDFCoefficients(1.489409090909091, 0.1489409090909091, 0, 14.89409090909091);
+
+
+            }
+
+            public class ShooterOut implements Action {
+                private boolean initialized = false;
+                private long startTime;
+                private final long runTimeMs = 3000; // 1 second (change this)
+
+
+                @Override
+                public boolean run(@NonNull TelemetryPacket packet) {
+                    if (!initialized) {
+                        outtake.setPower(-0.6);
+                        outtake2.setPower(0.6);
+                        startTime = System.currentTimeMillis();
+                        initialized = true;
+                    }
+
+
+                    long elapsed = System.currentTimeMillis() - startTime;
+                    packet.put("intakeTimeMs", elapsed);
+
+
+                    if (elapsed < runTimeMs) {
+                        return true; // keep running
+                    } else {
+                        outtake.setPower(0);
+                        outtake2.setPower(0);
+                        return false; // action finished
+                    }
+                }
+            }
+
+            public Action ShootOut() {
+                return new ShooterOut();
+            }
+        }
+
+        public class Feeder {
+            private CRServo rightFeeder;
+            private CRServo leftFeeder;
+
+
+            public Feeder(HardwareMap hardwareMap) {
+                leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
+                rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
+            }
+
+
+            public class leftFeed implements Action {
+
+
+                private boolean initialized = false;
+
+
+                public boolean run(@NonNull TelemetryPacket packet) {
+
+
+                    if (!initialized) {
+                        leftFeeder.setPower(1);
+                        initialized = true;
+                        return true;
+                    } else {
+                        leftFeeder.setPower(0);
+                        return false;
+                    }
+                }
+
+
+                public Action feedLeft() {
+                    return new leftFeed();
+                }
+            }
+
+
+            public class rightFeed implements Action {
+                private boolean initialized = false;
+
+
+                public boolean run(@NonNull TelemetryPacket packet) {
+
+
+                    if (!initialized) {
+                        rightFeeder.setPower(1);
+                        initialized = true;
+                        return true;
+                    } else {
+                        rightFeeder.setPower(0);
+                        return false;
+                    }
+                }
+
+                public Action feedRight() {
+                    return new rightFeed();
+                }
+            }
+
+
+        }
 
 
         public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-48, 48, Math.toRadians(135));
-        MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
+            Pose2d initialPose = new Pose2d(-65, 35, Math.toRadians(90));
+            MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
-       Intake intake = new Intake(hardwareMap);
-        Shooter shooter = new Shooter(hardwareMap);
-        Gate gate = new Gate(hardwareMap);
-        TurretTurn turretTurn = new TurretTurn(hardwareMap);
 
+            Intake intake = new Intake(hardwareMap);
+            Shooter shooter = new Shooter(hardwareMap);
+            TurretTurn turretTurn = new TurretTurn(hardwareMap);
+            Gate gate = new Gate(hardwareMap);
+            Hood hood = new Hood(hardwareMap);
 //        Feeder
 //                feeder = new Feeder(hardwareMap);
 
 
-
-        int visionOutputPosition = 1;
-
+            int visionOutputPosition = 1;
 
 
-        TrajectoryActionBuilder firstscore = drive.actionBuilder(initialPose)
-                .strafeToConstantHeading(new Vector2d(-10, 10));
+            TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
+                    .strafeToConstantHeading(new Vector2d(-7, 30));
 
 
-                //9 ball path
+            Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
 
 
 
+                    .strafeToConstantHeading(new Vector2d(-7, 55))
+                    .waitSeconds(0.5)
 
-            /*    TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose)
-                        .turn(45)
-                         .lineToYConstantHeading(25)
-                        .waitSeconds(1);
-                TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)
-                        .turn(45)
-                        .lineToYConstantHeading(25)
-                        .waitSeconds(1);*/
-        Action IntakeRow1 = firstscore.endTrajectory().fresh()
-                .turnTo(Math.toRadians(90))
-                .strafeToConstantHeading(new Vector2d(-10, 48))
-                .build();
-        Action ShootRow1 = firstscore.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-10, 10))
+
+                    .build();
+            Action trajectoryActionCloseout2 = tab1.endTrajectory().fresh()
+                    .strafeToConstantHeading(new Vector2d(-7, 15))
+
+
+
+
+//                .strafeToConstantHeading(new Vector2d(12,40))
 //                .strafeToConstantHeading(new Vector2d(-12,20))
 //                .turn(Math.toRadians(-45))
 
 
-                .build();
-        Action IntakeRowTwo = firstscore.endTrajectory().fresh()
-                .setTangent(Math.toRadians(20))
-                .splineToConstantHeading(new Vector2d(12, 48), Math.PI/2)
-                .build();
-            Action ComebackToShootRowTwo = firstscore.endTrajectory().fresh()
-                    .setTangent(5)
-                    .splineToConstantHeading(new Vector2d(-10, 10), Math.PI/2)
                     .build();
-
-            Action IntakeRowThree = firstscore.endTrajectory().fresh()
-                    .setTangent(Math.toRadians(20))
-                    .splineToConstantHeading(new Vector2d(36, 48), Math.PI/2)
-                    .build();
-            Action ComebackToShootRowThree = firstscore.endTrajectory().fresh()
-                    .setTangent(5)
-                    .splineToConstantHeading(new Vector2d(-10, 10), Math.PI/2)
-                    .build();
+            Action trajectoryActionCloseout3 = tab1.endTrajectory().fresh()
+                    .strafeToConstantHeading(new Vector2d(15, -12))
 
 
+                    .build();
+            Action trajectoryActionCloseout4 = tab1.endTrajectory().fresh()
+                    .strafeToConstantHeading(new Vector2d(15, -50))
+
+                    .build();
 
 
 
             int startPosition = visionOutputPosition;
-                 telemetry.addData("Starting Position", startPosition);
-                 telemetry.update();
-                 waitForStart();
-                 if (isStopRequested()) return;
-
-               Action trajectoryActionChosen;
-                 if (startPosition == 1) {
-                trajectoryActionChosen = firstscore.build();
-               } else if (startPosition == 2) {
-                     trajectoryActionChosen = firstscore.build();
-                 } else {
-                   trajectoryActionChosen = firstscore.build();
+            telemetry.addData("Starting Position", startPosition);
+            telemetry.update();
+            waitForStart();
+            if (isStopRequested()) return;
 
 
-                 }
+            Action trajectoryActionChosen;
+            if (startPosition == 1) {
+                trajectoryActionChosen = tab1.build();
+            } else if (startPosition == 2) {
+                trajectoryActionChosen = tab1.build();
+            } else {
+                trajectoryActionChosen = tab1.build();
+
+
+            }
+
+
 
             Actions.runBlocking(
                     new SequentialAction(
-                            trajectoryActionChosen
-                    )
-            );
-            Actions.runBlocking(
-                    new SequentialAction(
+                            hood.HoodActivation(),
+                           // gate.openGate(),
                             shooter.ShootOut()
 
+
+                    )
+            );
+            Actions.runBlocking(
+                    new ParallelAction(
+                            shooter.ShootOut(),
+                            intake.intakeIn()
+
                     )
             );
 
-               Actions.runBlocking(
-                new ParallelAction(
-                        shooter.ShootOut(),
-                        intake.intakeIn()
-
-                ));
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        turretTurn.TurretTurnShootingPOS(),
-                        gate.closeGate(),
-                        intake.intakeIn(),
-                        IntakeRow1
-
-                ));
-            Actions.runBlocking(
-                    new SequentialAction(
-                            gate.openGate(),
-                            ShootRow1
-                    ));
-        Actions.runBlocking(
-                new SequentialAction(
-                        shooter.ShootOut()
-
-
-                ));
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        shooter.ShootOut(),
-                        intake.intakeIn()
-
-
-                ));
-        Actions.runBlocking(
-                new ParallelAction(
-                        gate.closeGate(),
-                      intake.intakeIn(),
-                        IntakeRowTwo
-                )
-        );
-            Actions.runBlocking(
-                    new SequentialAction(
-                            ComebackToShootRowTwo
-                    ));
 
             Actions.runBlocking(
-                    new SequentialAction(
-                            gate.openGate(),
+                    new ParallelAction(
+                            trajectoryActionChosen,
+                            turretTurn.TurretTurnShootingPOS(),
+                            gate.closeGate()
+
+                    )
+            );
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                           trajectoryActionCloseOut,
+                            intake.intakeIn(),
                             shooter.ShootOut()
 
 
                     ));
-        Actions.runBlocking(
-                new ParallelAction(
-                        intake.intakeIn(),
-                        shooter.ShootOut()
+            Actions.runBlocking(
+                    new ParallelAction(
+                            trajectoryActionCloseout2,
+                            gate.openGate(),
+                            shooter.ShootOut()
 
-                )
-        );
+                    )
+            );//6 ball end
 
 
+            Actions.runBlocking(
+                    new ParallelAction(
+                            shooter.ShootOut(),
+                            intake.intakeIn()
 
 
+                    ));
+            Actions.runBlocking(
+                    new ParallelAction(
+                            shooter.ShootOut(),
+                            gate.openGate()
+
+
+                    )
+            );
+            Actions.runBlocking(
+                    new SequentialAction(
+
+
+                            trajectoryActionCloseout2,
+                            shooter.ShootOut()
+
+
+                    ));
+
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            shooter.ShootOut(),
+                            intake.intakeIn()
+
+
+                    ));
+//                new SequentialAction(
+//                        trajectoryActionCloseout3
+//
+//
+//                )
+//
+//
+//
+//        );
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        intake.intakeIn(),
+//                        trajectoryActionCloseout3
+//                )
+//        );
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        intake.intakeIn(),
+//                        shooter.ShootOut()
+//
+//                )
+//        );
 
 
         }
 
 
-
     }
+
 
 
 //                        .splineToConstantHeading(new Vector2d(42, 40), Math.toRadians(180))
@@ -354,7 +488,13 @@ public class AutoTest extends LinearOpMode{
 //                        .lineToX(40)
 
 
+
+
 //                    .splineToConstantHeading(new Vector2d (52,50),Math.toRadians(270))//50
+
+
+
+
 
 
 
@@ -365,7 +505,13 @@ public class AutoTest extends LinearOpMode{
 
 
 
+
+
+
 //}
+
+
+
 
 
 
@@ -472,15 +618,3 @@ public class AutoTest extends LinearOpMode{
 //                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
 //            } else {
 //                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-//                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
-//            }
-//        }   // end for() loop
-//
-//        // Add "key" information to telemetry
-//        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
-//        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-//        telemetry.addLine("RBE = Range, Bearing & Elevation");
-//
-//    }   // end method telemetryAprilTag()
-//
-//}
