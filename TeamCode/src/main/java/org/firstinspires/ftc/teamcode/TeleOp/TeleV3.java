@@ -370,7 +370,7 @@ public class TeleV3 extends LinearOpMode {
 
 
                 if (gamepad2.right_bumper){
-                    gate.setPosition(0.1);
+                    gate.setPosition(0.15);
 
 
 

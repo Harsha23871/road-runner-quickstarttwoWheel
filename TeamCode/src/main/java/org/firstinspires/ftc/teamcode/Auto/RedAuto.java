@@ -52,7 +52,7 @@ public class RedAuto extends LinearOpMode {
         public class CloseGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0.2);
+                Gate.setPosition(0.3);
                 return false;
             }
         }
@@ -153,7 +153,7 @@ public class RedAuto extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    intake.setPower(0.8);
+                    intake.setPower(0.7);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -209,8 +209,8 @@ public class RedAuto extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setPower(-0.7);
-                    outtake2.setPower(0.7);
+                    outtake.setPower(-0.5);
+                    outtake2.setPower(0.5);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -299,7 +299,7 @@ public class RedAuto extends LinearOpMode {
 
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-48, 48, Math.toRadians(135));
+        Pose2d initialPose = new Pose2d(-60, 38, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
 
@@ -316,20 +316,22 @@ public class RedAuto extends LinearOpMode {
 
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .strafeToConstantHeading(new Vector2d(-7, 12));
+                .strafeToConstantHeading(new Vector2d(-10, 30));
 
 
         Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
 
 
-                .turn(Math.toRadians(-45))
-                .strafeToConstantHeading(new Vector2d(-7, 50))
-                .waitSeconds(2)
+
+                .strafeToConstantHeading(new Vector2d(-10, 60))
+                .waitSeconds(0.5)
 
 
                 .build();
         Action trajectoryActionCloseout2 = tab1.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-8, 12))
+                .strafeToConstantHeading(new Vector2d(-7, 25))
+
+
 
 
 //                .strafeToConstantHeading(new Vector2d(12,40))
@@ -339,9 +341,15 @@ public class RedAuto extends LinearOpMode {
 
                 .build();
         Action trajectoryActionCloseout3 = tab1.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(15, -12))
 
 
                 .build();
+        Action trajectoryActionCloseout4 = tab1.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(15, -50))
+
+                .build();
+
 
 
         int startPosition = visionOutputPosition;
@@ -363,44 +371,56 @@ public class RedAuto extends LinearOpMode {
         }
 
 
+
         Actions.runBlocking(
                 new SequentialAction(
                         hood.HoodActivation(),
-                        gate.openGate(),
+                        // gate.openGate(),
                         shooter.ShootOut()
 
 
                 )
         );
+        Actions.runBlocking(
+                new ParallelAction(
+                        shooter.ShootOut(),
+                        intake.intakeIn()
+
+                )
+        );
 
 
         Actions.runBlocking(
                 new ParallelAction(
-                        shooter.ShootOut(),
-                        trajectoryActionChosen
-
+                        trajectoryActionChosen,
+                        turretTurn.TurretTurnShootingPOS(),
+                        gate.closeGate()
 
                 )
         );
 
         Actions.runBlocking(
                 new ParallelAction(
-                        shooter.ShootOut(),
-                        intake.intakeIn()
+                        trajectoryActionCloseOut,
+                        intake.intakeIn(),
+                        shooter.ShootOut()
 
 
                 ));
+        Actions.runBlocking(
+                new ParallelAction(
+                        trajectoryActionCloseout2,
+                        gate.openGate(),
+                        shooter.ShootOut()
+
+                )
+        );//6 ball end
 
 
         Actions.runBlocking(
                 new ParallelAction(
                         shooter.ShootOut(),
-                        intake.intakeIn(),
-                        gate.closeGate(),
-                        trajectoryActionCloseOut,
-
-
-                        turretTurn.TurretTurnShootingPOS()
+                        intake.intakeIn()
 
 
                 ));
@@ -430,7 +450,6 @@ public class RedAuto extends LinearOpMode {
 
 
                 ));
-//        Actions.runBlocking(
 //                new SequentialAction(
 //                        trajectoryActionCloseout3
 //

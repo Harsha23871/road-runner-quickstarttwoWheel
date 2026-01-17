@@ -1,14 +1,9 @@
-package org.firstinspires.ftc.teamcode.TeleOp.Tests;//package org.firstinspires.ftc.teamcode.tuning;
+package org.firstinspires.ftc.teamcode.Auto;//package org.firstinspires.ftc.teamcode.tuning;
 
 
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-
-import org.firstinspires.ftc.teamcode.TeleOp.AprilTagsWebCam;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
 import androidx.annotation.NonNull;
@@ -23,9 +18,6 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
@@ -35,8 +27,8 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 
 @Config
-@Autonomous(name = "Test Paths", group = "Autonomous")
-public class AutoTest extends LinearOpMode {
+@Autonomous(name = "RedFar ", group = "Autonomous")
+public class RedFar extends LinearOpMode {
 
 
     public class Gate {
@@ -93,7 +85,7 @@ public class AutoTest extends LinearOpMode {
         public class HoodActivation implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Hood.setPosition(0.6);
+                Hood.setPosition(0);
                 return false;
             }
         }
@@ -119,7 +111,7 @@ public class AutoTest extends LinearOpMode {
         public class TurretTurnShootingPOS implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                TurretTurn.setPosition(1);
+                TurretTurn.setPosition(0.5);
                 return false;
             }
         }
@@ -209,8 +201,8 @@ public class AutoTest extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setPower(-0.5);
-                    outtake2.setPower(0.5);
+                    outtake.setPower(-0.72);
+                    outtake2.setPower(0.72);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -299,7 +291,7 @@ public class AutoTest extends LinearOpMode {
 
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-60, 38, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(60, 10, Math.toRadians(180));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
 
@@ -315,16 +307,8 @@ public class AutoTest extends LinearOpMode {
         int visionOutputPosition = 1;
 
 
-
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .strafeToConstantHeading(new Vector2d(-10, 12));
-
-
-        Action DriveBack = tab1.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-60, 12))
-                .waitSeconds(2)
-
-                .build();
+                .strafeToConstantHeading(new Vector2d(-10, 30));
 
 
         Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
@@ -337,13 +321,7 @@ public class AutoTest extends LinearOpMode {
 
                 .build();
         Action trajectoryActionCloseout2 = tab1.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-7,23))
-
-
-
-
-
-
+                .strafeToConstantHeading(new Vector2d(-7, 25))
 
 
 
@@ -352,14 +330,17 @@ public class AutoTest extends LinearOpMode {
 //                .strafeToConstantHeading(new Vector2d(-12,20))
 //                .turn(Math.toRadians(-45))
 
-                .build();
-        Action trajectoryActionCloseout3 = tab1.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(15, 12))
-
 
                 .build();
+        Action Leave = tab1.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(55, 10))
 
 
+                .build();
+        Action trajectoryActionCloseout4 = tab1.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(15, -50))
+
+                .build();
 
 
 
@@ -380,87 +361,94 @@ public class AutoTest extends LinearOpMode {
 
 
         }
-        Actions.runBlocking(
-                new ParallelAction(
-                        DriveBack,
-                        shooter.ShootOut()
-                )
-        );
+
+
+
         Actions.runBlocking(
                 new SequentialAction(
                         hood.HoodActivation(),
-                        shooter.ShootOut()
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
-                        shooter.ShootOut(),
-                        intake.intakeIn()
-
-                )
-        );
-
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        trajectoryActionChosen,
                         turretTurn.TurretTurnShootingPOS(),
-                        gate.closeGate()
-
-                )
-        );
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        trajectoryActionCloseOut,
-                        intake.intakeIn(),
+                        // gate.openGate(),
                         shooter.ShootOut()
 
 
                 ));
-        Actions.runBlocking(
-                new ParallelAction(
-                        trajectoryActionCloseout2,
-                        gate.openGate(),
-                        shooter.ShootOut()
-
-                )
-        );//6 ball end
-
-
+//        );
         Actions.runBlocking(
                 new ParallelAction(
                         shooter.ShootOut(),
                         intake.intakeIn()
-
-
-                ));
-        Actions.runBlocking(
-                new ParallelAction(
-                        shooter.ShootOut(),
-                        gate.openGate()
-
 
                 )
         );
         Actions.runBlocking(
                 new SequentialAction(
+                       Leave
+
+                )
+        );
+//
+//
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        trajectoryActionChosen,
+//                        turretTurn.TurretTurnShootingPOS(),
+//                        gate.closeGate()
+//
+//                )
+//        );
+//
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        trajectoryActionCloseOut,
+//                        intake.intakeIn(),
+//                        shooter.ShootOut()
+//
+//
+//                ));
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        trajectoryActionCloseout2,
+//                        gate.openGate(),
+//                        shooter.ShootOut()
+//
+//                )
+//        );//6 ball end
+//
+//
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        shooter.ShootOut(),
+//                        intake.intakeIn()
+//
+//
+//                ));
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        shooter.ShootOut(),
+//                        gate.openGate()
+//
+//
+//                )
+//        );
+//        Actions.runBlocking(
+//                new SequentialAction(
+//
+//
+//                        trajectoryActionCloseout2,
+//                        shooter.ShootOut()
+//
+//
+//                ));
+//
+//
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        shooter.ShootOut(),
+//                        intake.intakeIn()
+//
 
 
-                        trajectoryActionCloseout2,
-                        shooter.ShootOut()
-
-
-                ));
-
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        shooter.ShootOut(),
-                        intake.intakeIn()
-
-
-                ));
 //                new SequentialAction(
 //                        trajectoryActionCloseout3
 //
