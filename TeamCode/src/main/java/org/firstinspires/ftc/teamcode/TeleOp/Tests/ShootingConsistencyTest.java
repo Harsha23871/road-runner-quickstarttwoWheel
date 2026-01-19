@@ -5,6 +5,7 @@ import android.util.Log;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,7 +16,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 @Config
-@TeleOp
+@Autonomous
 public class ShootingConsistencyTest extends LinearOpMode {
     public static double MOTOR_TICKS_PER_REV = 28;
     public static double MOTOR_MAX_RPM = 6000;
@@ -41,8 +42,13 @@ public class ShootingConsistencyTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         // Change my id
         DcMotorEx myMotor = hardwareMap.get(DcMotorEx.class, "outtake");
-        myMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        myMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        myMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        myMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
+
+        DcMotorEx myMotor2 = hardwareMap.get(DcMotorEx.class, "outtake2");
+        myMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        myMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         MotorConfigurationType motorConfigurationType = myMotor.getMotorType().clone();
         motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
