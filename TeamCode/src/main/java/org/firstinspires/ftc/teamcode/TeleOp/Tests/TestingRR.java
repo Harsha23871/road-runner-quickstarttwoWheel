@@ -106,6 +106,8 @@ public class TestingRR extends LinearOpMode{
             outtake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             outtake.setDirection(DcMotorEx.Direction.FORWARD);
             outtake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
+
 //            outtake.setVelocityPIDFCoefficients(1.489409090909091, 0.1489409090909091, 0, 14.89409090909091);
 
         }
@@ -221,18 +223,17 @@ public class TestingRR extends LinearOpMode{
         TrajectoryActionBuilder GoToFirstRow = drive.actionBuilder(initialPose)
                 .strafeToConstantHeading(new Vector2d(-10, 10));
 
-
-        Action IntakeRow1 = GoToFirstRow.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-10, 48))
-                .build();
-
         Action ShootRow1 = GoToFirstRow.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(-10, 10))
 //                .strafeToConstantHeading(new Vector2d(-12,20))
 //                .turn(Math.toRadians(-45))
-
-
                 .build();
+
+        Action IntakeRow1 = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(135)))
+                .turnTo(Math.toRadians(90))
+                .strafeToConstantHeading(new Vector2d(-10, 48))
+                .build();
+
         Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(135)))
                 .splineToConstantHeading(new Vector2d(12, 48), Math.PI / 2)
                 .build();
@@ -273,6 +274,7 @@ public class TestingRR extends LinearOpMode{
         }
         Actions.runBlocking(
                 new ParallelAction(
+                        trajectoryActionChosen,
                         hood.HoodActivation(),
                         shooter.ShootOut()
 
@@ -285,25 +287,51 @@ public class TestingRR extends LinearOpMode{
 
                 )
         );
-
         Actions.runBlocking(
                 new ParallelAction(
-                        trajectoryActionChosen,
+                        IntakeRow1,
+                        intake.intakeIn(),
+                        turretTurn.TurretTurnShootingPOS(),
                         gate.closeGate()
                 )
         );
-    /*    Actions.runBlocking(
-                new ParallelAction(
+        Actions.runBlocking(
+                new SequentialAction (
+                        ShootRow1
 
-                        turretTurn.TurretTurnShootingPOS(),
+                )
+        );
+        Actions.runBlocking(
+                new ParallelAction (
                         shooter.ShootOut(),
-                        IntakeRow1,
+
+                        gate.openGate()
+                )
+        );
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        shooter.ShootOut(),
                         intake.intakeIn()
                 )
         );
 
         Actions.runBlocking(
-                new ParallelAction(                        ShootRow1,
+                new ParallelAction(
+                        ShootRow1,
+                        shooter.ShootOut()
+
+
+                )
+        );
+        Actions.runBlocking(
+                new SequentialAction(
+                        gate.openGate()
+
+                ));
+
+        Actions.runBlocking(
+                new ParallelAction(
                         shooter.ShootOut(),
                         intake.intakeIn()
 
@@ -361,7 +389,7 @@ public class TestingRR extends LinearOpMode{
                         shooter.ShootOut()
 
                 )
-        );*/
+        );
 
 
 

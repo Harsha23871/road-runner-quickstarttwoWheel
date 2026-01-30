@@ -63,15 +63,15 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         // drive model parameters
-        public double inPerTick = 0.0030384875084402;
-        public double lateralInPerTick  = 0.002060331731043943;
-        public double trackWidthTicks = 4074.211159611584
+        public double inPerTick = 0.0029645855146476;
+        public double lateralInPerTick  = 0.00196691662;
+        public double trackWidthTicks = 4290.488036399757
                 ;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.558035204296957;
-        public double kV = 0.0003726179157696016;//
-        public double kA = 0.00009;
+        public double kS = 1.35668594173;
+        public double kV = 0.00037545196;//
+        public double kA = 0.0000001 ;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -83,9 +83,9 @@ public final class MecanumDrive {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 4;
-        public double lateralGain = 3;
-        public double headingGain = 5; // shared with turn
+        public double axialGain = 0;
+        public double lateralGain = 0;
+        public double headingGain = 0; // shared with turn
 
         public double axialVelGain = 0;
         public double lateralVelGain = 0;
@@ -454,14 +454,14 @@ public final class MecanumDrive {
     public PoseVelocity2d updatePoseEstimate() {
         PoseVelocity2d vel = localizer.update();
         poseHistory.add(localizer.getPose());
-        
+
         while (poseHistory.size() > 100) {
             poseHistory.removeFirst();
         }
 
         estimatedPoseWriter.write(new PoseMessage(localizer.getPose()));
-        
-        
+
+
         return vel;
     }
 
