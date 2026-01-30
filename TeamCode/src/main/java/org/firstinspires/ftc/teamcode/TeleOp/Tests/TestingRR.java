@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Auto.RedAuto;
 import org.firstinspires.ftc.teamcode.TeleOp.AprilTagsWebCam;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -100,6 +101,8 @@ public class TestingRR extends LinearOpMode{
 
     public class Shooter {
         private DcMotorEx outtake;
+        private DcMotorEx outtake2;
+
 
         public Shooter(HardwareMap hardwareMap) {
             outtake = hardwareMap.get(DcMotorEx.class, "outtake");
@@ -108,35 +111,47 @@ public class TestingRR extends LinearOpMode{
             outtake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
 
+            outtake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
+            outtake2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            outtake2.setDirection(DcMotorEx.Direction.FORWARD);
+            outtake2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 //            outtake.setVelocityPIDFCoefficients(1.489409090909091, 0.1489409090909091, 0, 14.89409090909091);
 
+
         }
+
         public class ShooterOut implements Action {
             private boolean initialized = false;
             private long startTime;
             private final long runTimeMs = 3000; // 1 second (change this)
 
+
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setPower(-0.8);
+                    outtake.setPower(-0.5);
+                    outtake2.setPower(0.5);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
 
+
                 long elapsed = System.currentTimeMillis() - startTime;
                 packet.put("intakeTimeMs", elapsed);
+
 
                 if (elapsed < runTimeMs) {
                     return true; // keep running
                 } else {
                     outtake.setPower(0);
+                    outtake2.setPower(0);
                     return false; // action finished
                 }
             }
         }
+
         public Action ShootOut() {
-            return new ShooterOut();
+            return new Shooter.ShooterOut();
         }
     }
     public class Gate {
@@ -211,9 +226,6 @@ public class TestingRR extends LinearOpMode{
         TurretTurn turretTurn = new TurretTurn(hardwareMap);
         Hood hood = new Hood(hardwareMap);
 
-//        Feeder
-//                feeder = new Feeder(hardwareMap);
-
 
 
         int visionOutputPosition = 1;
@@ -234,19 +246,28 @@ public class TestingRR extends LinearOpMode{
                 .strafeToConstantHeading(new Vector2d(-10, 48))
                 .build();
 
-        Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(135)))
+        Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(12, 48), Math.PI / 2)
                 .build();
 
-        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, 48, Math.toRadians(135)))
+        Action OpenGate1 = drive.actionBuilder(new Pose2d(12, 48, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(0, 56), -Math.PI / 2)
+                .build();
+
+        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, 48, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(-10, 10), -Math.PI / 2)
                 .build();
 
-        Action IntakeRowThree = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(135)))
+        Action IntakeFromGate = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(9,55),Math.PI/2)
+
+                .build();
+
+        Action IntakeRowThree = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(36, 48), Math.PI / 2)
                 .build();
 
-        Action ComebackToShootRowThree = drive.actionBuilder(new Pose2d(36, 48, Math.toRadians(135)))
+        Action ComebackToShootRowThree = drive.actionBuilder(new Pose2d(36, 48, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(-10, 10), -Math.PI / 2)
                 .build();
 
@@ -296,39 +317,52 @@ public class TestingRR extends LinearOpMode{
                 )
         );
         Actions.runBlocking(
-                new SequentialAction (
-                        ShootRow1
+                new ParallelAction (
+                        ShootRow1,
+                        shooter.ShootOut(),
+                        gate.openGate()
 
                 )
         );
+
         Actions.runBlocking(
                 new ParallelAction (
                         shooter.ShootOut(),
-
-                        gate.openGate()
-                )
-        );
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        shooter.ShootOut(),
                         intake.intakeIn()
                 )
         );
 
         Actions.runBlocking(
+                new SequentialAction(
+                        gate.closeGate()
+                )
+        );
+
+        Actions.runBlocking(
                 new ParallelAction(
-                        ShootRow1,
-                        shooter.ShootOut()
+                        IntakeRowTwo,
+                        intake.intakeIn()
 
 
                 )
         );
+        //Might have to change pls be cautious
         Actions.runBlocking(
+                new SequentialAction(
+                        OpenGate1,
+                        new ParallelAction(
+                                ComebackToShootRowTwo,
+                                shooter.ShootOut(),
+                                gate.openGate()
+
+                        )
+                )
+        );
+        /*Actions.runBlocking(
                 new SequentialAction(
                         gate.openGate()
 
-                ));
+                ));*/
 
         Actions.runBlocking(
                 new ParallelAction(
@@ -337,15 +371,19 @@ public class TestingRR extends LinearOpMode{
 
                 ));
 
-        Actions.runBlocking(
-                new ParallelAction(
-                        turretTurn.TurretTurnShootingPOS(),
-                        gate.closeGate(),
-                        intake.intakeIn(),
-                        IntakeRow1
+        //Stooooop
 
-                ));
         Actions.runBlocking(
+                new SequentialAction(
+                        gate.closeGate(),
+                        new ParallelAction(
+                                IntakeFromGate,
+                                intake.intakeIn()
+                        )
+                ));
+
+
+       /* Actions.runBlocking(
                 new SequentialAction(
                         gate.openGate(),
                         ShootRow1
@@ -389,7 +427,7 @@ public class TestingRR extends LinearOpMode{
                         shooter.ShootOut()
 
                 )
-        );
+        );*/
 
 
 
@@ -401,142 +439,3 @@ public class TestingRR extends LinearOpMode{
 
 
 }
-
-
-//                        .splineToConstantHeading(new Vector2d(42, 40), Math.toRadians(180))
-//                        .splineToConstantHeading(new Vector2d (10,55),Math.toRadians(270))
-//                        .waitSeconds(0.1)//50-y
-//                        .lineToX(60)
-//                        .lineToX(40)
-
-
-//                    .splineToConstantHeading(new Vector2d (52,50),Math.toRadians(270))//50
-
-
-
-
-//                    .splineToConstantHeading(new Vector2d(36, -25), Math.toRadians(270))
-//                    .lineToX(49)
-//                    .lineToY(-59)
-
-
-
-//}
-
-
-
-//public class ServoAction implements Action {
-//    Servo servo;
-//    double position;
-//
-//    public ServoAction(Servo s, double p) {
-//
-//        this.servo = s;
-//        this.position = p;
-//    }
-//
-//    @Override
-//    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-//        servo.setPosition(position);
-//        return (false);
-//
-//
-//    }
-//
-//
-//}}
-//@Disabled
-//public class April extends LinearOpMode {
-//
-//    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-//
-//    private AprilTagProcessor aprilTag;
-//
-//    private VisionPortal visionPortal;
-//
-//    @Override
-//    public void runOpMode() {
-//
-//        initAprilTag();
-//
-//        // Wait for the DS start button to be touched.
-//        telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-//        telemetry.addData(">", "Touch START to start OpMode");
-//        telemetry.update();
-//        waitForStart();
-//
-//        if (opModeIsActive()) {
-//            while (opModeIsActive()) {
-//
-//                telemetryAprilTag();
-//
-//                telemetry.update();
-//
-//                if (gamepad1.dpad_down) {
-//                    visionPortal.stopStreaming();
-//                } else if (gamepad1.dpad_up) {
-//                    visionPortal.resumeStreaming();
-//                }
-//
-//                // Share the CPU.
-//                sleep(20);
-//            }
-//        }
-//
-//
-//        visionPortal.close();
-//
-//    }
-//    private void initAprilTag() {
-//
-//        aprilTag = new AprilTagProcessor.Builder()
-//
-//
-//                .build();
-//
-//        aprilTag.setDecimation(3);
-//
-//
-//        VisionPortal.Builder builder = new VisionPortal.Builder();
-//
-//        if (USE_WEBCAM) {
-//            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-//        } else {
-//            builder.setCamera(BuiltinCameraDirection.BACK);
-//        }
-//
-//        builder.addProcessor(aprilTag);
-//        visionPortal = builder.build();
-//
-//    }
-//
-//
-//    /**
-//     * Add telemetry about AprilTag detections.
-//     */
-//    private void telemetryAprilTag() {
-//
-//        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-//        telemetry.addData("# AprilTags Detected", currentDetections.size());
-//
-//        // Step through the list of detections and display info for each one.
-//        for (AprilTagDetection detection : currentDetections) {
-//            if (detection.metadata != null) {
-//                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-//                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-//                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-//                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
-//            } else {
-//                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-//                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
-//            }
-//        }   // end for() loop
-//
-//        // Add "key" information to telemetry
-//        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
-//        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-//        telemetry.addLine("RBE = Range, Bearing & Elevation");
-//
-//    }   // end method telemetryAprilTag()
-//
-//}
