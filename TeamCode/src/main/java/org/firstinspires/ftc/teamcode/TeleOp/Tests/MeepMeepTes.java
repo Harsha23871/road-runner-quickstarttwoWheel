@@ -33,8 +33,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Autonomous(name = "TestingRR", group = "Autonomous")
-public class TestingRR extends LinearOpMode{
+@Autonomous(name = "lebronjames", group = "Autonomous")
+public class MeepMeepTes extends LinearOpMode{
 
 
     public class Intake {
@@ -94,7 +94,7 @@ public class TestingRR extends LinearOpMode{
             }
         }
         public Action HoodActivation() {
-            return new TestingRR.Hood.HoodActivation();
+            return new Hood.HoodActivation();
         }
     }
 
@@ -165,7 +165,7 @@ public class TestingRR extends LinearOpMode{
         public class CloseGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0.15);
+                Gate.setPosition(0.55);
                 return false;
             }
         }
@@ -178,7 +178,7 @@ public class TestingRR extends LinearOpMode{
         public class OpenGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0);
+                Gate.setPosition(1);
                 return false;
             }
         }
@@ -201,7 +201,7 @@ public class TestingRR extends LinearOpMode{
         public class TurretTurnShootingPOS implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                TurretTurn.setPosition(0.7);
+                TurretTurn.setPosition(1);
                 return false;
             }
         }
@@ -217,7 +217,7 @@ public class TestingRR extends LinearOpMode{
 
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-65, 38, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(-48, 48, Math.toRadians(135));
         MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
 
         Intake intake = new Intake(hardwareMap);
@@ -233,22 +233,46 @@ public class TestingRR extends LinearOpMode{
 
 
         TrajectoryActionBuilder GoToFirstRow = drive.actionBuilder(initialPose)
-                .strafeToConstantHeading(new Vector2d(-15, 25));
+                .strafeToConstantHeading(new Vector2d(-10, 10));
 
+        Action test = GoToFirstRow.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(-10, 10))
 
-        Action IntakeRow1 = drive.actionBuilder(new Pose2d(-15, 25, Math.toRadians(90)))
-                .strafeToConstantHeading(new Vector2d(-15, 55))
+                .waitSeconds(1)
+
+                .turnTo(Math.toRadians(90))
+
+                .waitSeconds(1)
+
+                .strafeToConstantHeading(new Vector2d(-10, 50))
+
+                .waitSeconds(1)
+
+                .strafeToConstantHeading(new Vector2d(-10, 10))
+
+                .waitSeconds(1)
+
+                .setTangent(Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(14, 50), Math.PI/2)
+
+                .waitSeconds(1)
+
+                .setTangent(Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(-10, 10), Math.PI/2)
+
+                .waitSeconds(1)
+
+                .setTangent(20)
+                .splineTo(new Vector2d(20, 62), Math.toRadians(100))
+
                 .build();
 
-        Action ShootRow1 = GoToFirstRow.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-15, 10))
-//                .strafeToConstantHeading(new Vector2d(-12,20))
-//                .turn(Math.toRadians(-45))
+        Action IntakeRow1 = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(135)))
+                .turnTo(Math.toRadians(90))
+                .strafeToConstantHeading(new Vector2d(-10, 48))
                 .build();
 
-
-
-        Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-15, 10, Math.toRadians(90)))
+        Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(12, 48), Math.PI / 2)
                 .build();
 
@@ -296,115 +320,13 @@ public class TestingRR extends LinearOpMode{
 
 
         }
-        Actions.runBlocking(
-                new ParallelAction(
-                        shooter.ShootOut()
-
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
-                        shooter.ShootOut(),
-                        intake.intakeIn()
-
-                )
-        );
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        trajectoryActionChosen,
-                        gate.closeGate()
-
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
-                        IntakeRow1,
-                        intake.intakeIn(),
-                        turretTurn.TurretTurnShootingPOS()
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction (
-                        ShootRow1,
-                        shooter.ShootOut(),
-                        gate.openGate()
-
-                )
-        );
-
-        Actions.runBlocking(
-                new ParallelAction (
-                        shooter.ShootOut(),
-                        intake.intakeIn()
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
-                        gate.closeGate(),
-                        IntakeRowTwo,
-                        intake.intakeIn()
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction (
-                        shooter.ShootOut(),
-                        ComebackToShootRowTwo
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction (
-                        shooter.ShootOut(),
-                        intake.intakeIn()
-                )
-        );
 
 
-//        Actions.runBlocking(
-//                new SequentialAction(
-//                        gate.closeGate()
-//                )
-//        );
-//
-//        Actions.runBlocking(
-//                new ParallelAction(
-//                        IntakeRowTwo,
-//                        intake.intakeIn()
-//
-//
-//                )
-//        );
-//        //Might have to change pls be cautious
-//        Actions.runBlocking(
-//                        new ParallelAction(
-//                                ComebackToShootRowTwo,
-//                                shooter.ShootOut(),
-//                                gate.openGate()
-//                )
-//        );
-//        /*Actions.runBlocking(
-//                new SequentialAction(
-//                        gate.openGate()
-//
-//                ));*/
-//
-//        Actions.runBlocking(
-//                new ParallelAction(
-//                        shooter.ShootOut(),
-//                        intake.intakeIn()
-//
-//                ));
-//
-//        //Stooooop
-//
-//        Actions.runBlocking(
-//                new SequentialAction(
-//                        gate.closeGate(),
-//                        new ParallelAction(
-//                                IntakeFromGate,
-//                                intake.intakeIn()
-//                        )
-//                ));
+        Actions.runBlocking(
+                new SequentialAction(
+                test
+
+                ));
 
 
        /* Actions.runBlocking(

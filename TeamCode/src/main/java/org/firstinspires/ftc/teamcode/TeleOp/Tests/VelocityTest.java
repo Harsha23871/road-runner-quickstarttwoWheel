@@ -16,17 +16,17 @@ public class VelocityTest extends LinearOpMode {
     ElapsedTime TestTimer = new ElapsedTime();
     double currentVelocity;
     double maxVelocity = 0.0;
-    private double kP = 5.7;
+    private double kP = 8;
     private double kI = 0;
-    private double kD = 0.1;
-    private double kF = 2;
+    private double kD = 0.01;
+    private double kF = 8.8;
 
 
     @Override
     public void runOpMode() {
 
         motor = hardwareMap.get(DcMotorEx.class, "outtake");
-        motor.setDirection(DcMotorEx.Direction.FORWARD);
+        motor.setDirection(DcMotorEx.Direction.REVERSE);
 
 
         waitForStart();
@@ -35,7 +35,7 @@ public class VelocityTest extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-            int TargetVelocity = 1300*28/60;
+            int TargetVelocity = 4200*28/60;
 
 
             if (currentVelocity > maxVelocity) {
@@ -45,18 +45,14 @@ public class VelocityTest extends LinearOpMode {
             motor.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER,
                     new PIDFCoefficients(kP, kI, kD, kF));
             motor.setVelocity(TargetVelocity);
-            currentVelocity = motor.getVelocity()*60/28;
+            currentVelocity = motor.getVelocity()*60/20;
             /*if (TestTimer.milliseconds() > 500) {*/
 
 
                 telemetry.addData("current velocity", currentVelocity);
                 telemetry.addData("maximum velocity", maxVelocity);
                 telemetry.update();
-              //  TestTimer.reset();
-            //}
 
-
-//            motor.setPower(1);
         }
     }
 }

@@ -148,8 +148,6 @@ public class TeleV3 extends LinearOpMode {
         initAprilTag();
 
 
-
-
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
         telemetry.addData(">", "Touch START to start OpMode");
@@ -197,9 +195,6 @@ public class TeleV3 extends LinearOpMode {
         outtake = hardwareMap.get(DcMotorEx.class, "outtake");
         intake = hardwareMap.get(DcMotorEx.class, "intake");
 
-
-
-
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -211,13 +206,7 @@ public class TeleV3 extends LinearOpMode {
         outtake.setDirection(DcMotorSimple.Direction.FORWARD);
         outtake2.setDirection(DcMotorSimple.Direction.FORWARD);
 
-
-
-
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
-
-
-
 
         outtake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         outtake2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -336,8 +325,8 @@ public class TeleV3 extends LinearOpMode {
 
 
                 if (gamepad2.y) {
-                    outtake.setPower(-0.5);
-                    outtake2.setPower(0.5);
+                    outtake.setPower(-0.7);
+                    outtake2.setPower(0.7);
 
 
 
@@ -355,8 +344,8 @@ public class TeleV3 extends LinearOpMode {
 
 
                 if (gamepad2.x) {
-                    outtake.setPower(0.5);
-                    outtake2.setPower(-0.5);
+                    outtake.setPower(0.7);
+                    outtake2.setPower(-0.7);
                 } else if (gamepad2.b) { // stop flywheel
                     outtake.setPower(0);
                     outtake2.setPower(0);

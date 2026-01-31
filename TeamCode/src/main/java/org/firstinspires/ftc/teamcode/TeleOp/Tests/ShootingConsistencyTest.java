@@ -42,12 +42,12 @@ public class ShootingConsistencyTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         // Change my id
         DcMotorEx myMotor = hardwareMap.get(DcMotorEx.class, "outtake");
-        myMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        myMotor.setDirection(DcMotorEx.Direction.FORWARD);
         myMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
 
         DcMotorEx myMotor2 = hardwareMap.get(DcMotorEx.class, "outtake2");
-        myMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        myMotor.setDirection(DcMotorEx.Direction.REVERSE);
         myMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         MotorConfigurationType motorConfigurationType = myMotor.getMotorType().clone();
