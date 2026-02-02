@@ -56,6 +56,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
@@ -100,18 +101,6 @@ public class TeleV3 extends LinearOpMode {
     DcMotorEx intake, outtake, outtake2;
     Servo hood,  gate, turretservo;
 
-
-
-
-
-
-
-
-    // true for webcam, false for phone camera
-
-
-
-
     /**
      * The variable to store our instance of the AprilTag processor.
      */
@@ -133,17 +122,6 @@ public class TeleV3 extends LinearOpMode {
     double rightBackPower;
     @Override
     public void runOpMode() {
-
-
-
-
-
-
-
-
-
-
-
 
         initAprilTag();
 
@@ -191,8 +169,7 @@ public class TeleV3 extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "RF");
         leftBackDrive = hardwareMap.get(DcMotor.class, "LB");
         rightBackDrive = hardwareMap.get(DcMotor.class, "RB");
-        outtake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
-        outtake = hardwareMap.get(DcMotorEx.class, "outtake");
+
         intake = hardwareMap.get(DcMotorEx.class, "intake");
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -203,28 +180,34 @@ public class TeleV3 extends LinearOpMode {
 
 
 
-        outtake.setDirection(DcMotorSimple.Direction.FORWARD);
-        outtake2.setDirection(DcMotorSimple.Direction.FORWARD);
+
 
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        outtake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        outtake2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
 
 
-        //        motor = hardwareMap.get(DcMotorEx.class, "outtake"); // tune this
-        // motor = hardwareMap.get(DcMotorEx.class, "CoreHex");
-        //  motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //  motor.setVelocityPIDFCoefficients(1.137743055555556, 0.1137743055555556, 0, 11.37743055555556);
-//        outtake.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(1.137743055555556, 0.1137743055555556, 0, 11.37743055555556));
-//        outtake2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(1.137743055555556, 0.1137743055555556, 0, 11.37743055555556));
+        outtake = hardwareMap.get(DcMotorEx.class, "outtake");
+        outtake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
+        outtake.setDirection(DcMotorSimple.Direction.FORWARD);
+        outtake2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        outtake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);// tune this
+        outtake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        outtake.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
+                new PIDFCoefficients(8, 0, 0.01, 8.8));
+        outtake2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
+                new PIDFCoefficients(8, 0, 0.01, 8.8));
 
 
 
 
-//hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhi
+
+
+
+
         /*
          * Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to
          * slow down much faster when it is coasting. This creates a much more controllable
@@ -339,6 +322,14 @@ public class TeleV3 extends LinearOpMode {
 
 
                 }
+                else if (gamepad2.a) { // stop flywheel
+                    outtake.setPower(-1);
+                    outtake2.setPower(1);
+
+
+
+
+                }
 
 
 
@@ -375,10 +366,10 @@ public class TeleV3 extends LinearOpMode {
 
 
 
+                if (gamepad1.left_bumper) {
+                    turretservo.setPosition(0.5);
 
-                turretservo.setPosition(0.5);
-
-
+                }
 
 
 

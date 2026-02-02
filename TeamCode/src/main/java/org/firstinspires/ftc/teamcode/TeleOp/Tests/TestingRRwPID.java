@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.TeleOp.Tests;//package org.firstinspires.
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import androidx.annotation.NonNull;
@@ -24,10 +25,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Autonomous(name = "TestingRR", group = "Autonomous")
-public class TestingRR extends LinearOpMode{
+@Autonomous(name = "TestingRRwPID", group = "Autonomous")
+public class TestingRRwPID extends LinearOpMode{
 
-double Speed;
+    double Speed;
     public class Intake {
         private DcMotorEx intake;
 
@@ -86,7 +87,7 @@ double Speed;
             }
         }
         public Action HoodActivation() {
-            return new TestingRR.Hood.HoodActivation();
+            return new Hood.HoodActivation();
         }
     }
 
@@ -99,7 +100,7 @@ double Speed;
         public Shooter(HardwareMap hardwareMap) {
             outtake = hardwareMap.get(DcMotorEx.class, "outtake");
             outtake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            outtake.setDirection(DcMotorEx.Direction.FORWARD);
+            outtake.setDirection(DcMotorEx.Direction.REVERSE);
             outtake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
             outtake.setVelocityPIDFCoefficients(8, 0, 0.01, 8.8);
 
@@ -122,14 +123,14 @@ double Speed;
         public class ShooterOut implements Action {
             private boolean initialized = false;
             private long startTime;
-            private final long runTimeMs = 2500; // 1 second (change this)
+            private final long runTimeMs = 3000; // 1 second (change this)
 
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setPower(-0.55);
-                    outtake2.setPower(0.55);
+                    outtake.setVelocity(2900*28/60);
+                    outtake2.setVelocity(2900*28/60);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -142,8 +143,8 @@ double Speed;
                 if (elapsed < runTimeMs) {
                     return true; // keep running
                 } else {
-                    outtake.setPower(0);
-                    outtake2.setPower(0);
+                    outtake.setVelocity(0);
+                    outtake2.setVelocity(0);
                     return false; // action finished
                 }
             }
@@ -155,14 +156,14 @@ double Speed;
         public class ShooterRev implements Action {
             private boolean initialized = false;
             private long startTime;
-            private final long runTimeMs = 2500; // 1 second (change this)
+            private final long runTimeMs = 3000; // 1 second (change this)
 
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setPower(-0.8);
-                    outtake2.setPower(0.8);
+                    outtake.setVelocity(3500*28/60);
+                    outtake2.setVelocity(3500*28/60);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -175,8 +176,8 @@ double Speed;
                 if (elapsed < runTimeMs) {
                     return true; // keep running
                 } else {
-                    outtake.setPower(0);
-                    outtake2.setPower(0);
+                    outtake.setVelocity(0);
+                    outtake2.setVelocity(0);
                     return false; // action finished
                 }
             }
@@ -286,14 +287,14 @@ double Speed;
 
         Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-30, 15, Math.toRadians(90)))
                 .setTangent(Math.toRadians(330))
-                .splineToConstantHeading(new Vector2d(16, 55), Math.PI / 2)
+                .splineToConstantHeading(new Vector2d(12, 55), Math.PI / 2)
                 .build();
 
         Action OpenGate1 = drive.actionBuilder(new Pose2d(12, 48, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(0, 56), -Math.PI / 2)
                 .build();
 
-        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(16, 55, Math.toRadians(90)))
+        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, 55, Math.toRadians(90)))
                 .setTangent(Math.toRadians(270))
                 .splineToConstantHeading(new Vector2d(-30, 15), -Math.PI / 2)
                 .build();
@@ -342,7 +343,7 @@ double Speed;
 
         Actions.runBlocking(
                 new ParallelAction(
-                       shooter.ShootOut()
+                        shooter.ShootOut()
 
                 )
         );
@@ -362,14 +363,14 @@ double Speed;
 
                 )
         );
-                          Actions.runBlocking(
-                                new ParallelAction(
-                                        hood.HoodActivation(),
-                                        IntakeRow1,
-                                        intake.intakeIn(),
-                                        turretTurn.TurretTurnShootingPOS()
-                                )
-                          );
+        Actions.runBlocking(
+                new ParallelAction(
+                        hood.HoodActivation(),
+                        IntakeRow1,
+                        intake.intakeIn(),
+                        turretTurn.TurretTurnShootingPOS()
+                )
+        );
 
         Actions.runBlocking(
                 new ParallelAction (

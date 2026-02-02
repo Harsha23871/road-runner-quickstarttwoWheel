@@ -35,9 +35,10 @@ public class VelocityTest extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-            int TargetVelocity = 4200*28/60;
-
-
+            int TargetVelocity = 2800*28/60;
+//2900 auto close
+//3500 for auto cycle-shooting position
+            //
             if (currentVelocity > maxVelocity) {
                 maxVelocity = currentVelocity;
             }
