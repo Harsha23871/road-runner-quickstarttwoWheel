@@ -46,7 +46,7 @@ public class VelocityTest extends LinearOpMode {
             motor.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER,
                     new PIDFCoefficients(kP, kI, kD, kF));
             motor.setVelocity(TargetVelocity);
-            currentVelocity = motor.getVelocity()*60/20;
+            currentVelocity = motor.getVelocity();
             /*if (TestTimer.milliseconds() > 500) {*/
 
 
