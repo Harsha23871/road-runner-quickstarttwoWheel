@@ -131,7 +131,7 @@ double Speed;
                     outtake.setPower(-0.55);
                     outtake2.setPower(0.55);
                     startTime = System.currentTimeMillis();
-                    initialized = true;
+                    initialized = true    ;
                 }
 
 
