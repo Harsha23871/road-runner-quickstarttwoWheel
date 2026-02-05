@@ -129,8 +129,8 @@ public class TestingRRwPID extends LinearOpMode{
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setVelocity(2900*28/60);
-                    outtake2.setVelocity(2900*28/60);
+                    outtake.setVelocity(2700*28/60);
+                    outtake2.setVelocity(2700*28/60);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -290,7 +290,7 @@ public class TestingRRwPID extends LinearOpMode{
                 .splineToConstantHeading(new Vector2d(12, 55), Math.PI / 2)
                 .build();
 
-        Action OpenGate1 = drive.actionBuilder(new Pose2d(12, 48, Math.toRadians(90)))
+        Action OpenGate1 = drive.actionBuilder(new Pose2d(12, 55, Math.toRadians(90)))
                 .splineToConstantHeading(new Vector2d(0, 56), -Math.PI / 2)
                 .build();
 
@@ -330,7 +330,8 @@ public class TestingRRwPID extends LinearOpMode{
         if (isStopRequested()) return;
 
         Action trajectoryActionChosen;
-        if (startPosition == 1) {
+        trajectoryActionChosen = GoToFirstRow.build();
+  /*      if (startPosition == 1) {
             trajectoryActionChosen = GoToFirstRow.build();
         } else if (startPosition == 2) {
             trajectoryActionChosen = GoToFirstRow.build();
@@ -339,13 +340,14 @@ public class TestingRRwPID extends LinearOpMode{
 
 
 
-        }
+        } */
 
         Actions.runBlocking(
                 new ParallelAction(
                         shooter.ShootOut()
 
                 )
+
         );
         Actions.runBlocking(
                 new ParallelAction(
@@ -400,6 +402,13 @@ public class TestingRRwPID extends LinearOpMode{
                         intake.intakeIn()
                 )
         );
+        Actions.runBlocking(
+                new ParallelAction(
+                       OpenGate1,
+                        intake.intakeIn()
+                )
+        );
+
         Actions.runBlocking(
                 new ParallelAction (
                         gate.closeGate(),

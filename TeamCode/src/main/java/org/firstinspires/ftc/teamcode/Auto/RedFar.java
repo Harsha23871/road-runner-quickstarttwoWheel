@@ -201,8 +201,9 @@ public class RedFar extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setPower(-0.72);
-                    outtake2.setPower(0.72);
+                    outtake.setVelocity(5500*28/60);
+                    outtake2.setVelocity(5500*28/60);
+
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -291,7 +292,7 @@ public class RedFar extends LinearOpMode {
 
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(60, 10, Math.toRadians(180));
+        Pose2d initialPose = new Pose2d(64, 12, Math.toRadians(180));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
 
@@ -308,20 +309,18 @@ public class RedFar extends LinearOpMode {
 
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .strafeToConstantHeading(new Vector2d(-10, 30));
+                .splineTo(new Vector2d(36, 24), Math.toRadians(90));
 
 
         Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
-
-
 
                 .strafeToConstantHeading(new Vector2d(-10, 60))
                 .waitSeconds(0.5)
 
 
                 .build();
-        Action trajectoryActionCloseout2 = tab1.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-7, 25))
+        Action IntakeRow3 = tab1.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(36, 55))
 
 
 
@@ -332,10 +331,10 @@ public class RedFar extends LinearOpMode {
 
 
                 .build();
-        Action Leave = tab1.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(55, 10))
-
-
+        Action ShootRow3 = tab1.endTrajectory().fresh()
+                .splineToConstantHeading(new Vector2d(36, 24), Math.toRadians(90))
+                .setTangent(360)
+                .strafeToLinearHeading(new Vector2d(64,12),Math.toRadians(180))
                 .build();
         Action trajectoryActionCloseout4 = tab1.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(15, -50))
@@ -370,8 +369,6 @@ public class RedFar extends LinearOpMode {
                         turretTurn.TurretTurnShootingPOS(),
                         // gate.openGate(),
                         shooter.ShootOut()
-
-
                 ));
 //        );
         Actions.runBlocking(
@@ -383,8 +380,24 @@ public class RedFar extends LinearOpMode {
         );
         Actions.runBlocking(
                 new SequentialAction(
-                       Leave
+                        trajectoryActionChosen,
+                        gate.closeGate(),
+                        new ParallelAction(
+                                IntakeRow3,
+                                intake.intakeIn()
+                        )
 
+                )
+
+        );
+        Actions.runBlocking(
+                new ParallelAction(
+                     ShootRow3,
+                        shooter.ShootOut(),
+                        new ParallelAction(
+                                shooter.ShootOut(),
+                                intake.intakeIn()
+                        )
                 )
         );
 //

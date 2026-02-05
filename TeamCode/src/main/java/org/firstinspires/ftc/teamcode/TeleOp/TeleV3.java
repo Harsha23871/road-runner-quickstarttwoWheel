@@ -97,7 +97,7 @@ import java.util.List;
 
 
 public class TeleV3 extends LinearOpMode {
-    DcMotor rightBackDrive, rightFrontDrive, leftFrontDrive, leftBackDrive;
+    DcMotor rightBackDrive, rightFrontDrive, leftFrontDrive, leftBackDrive, kickstand;
     DcMotorEx intake, outtake, outtake2;
     Servo hood,  gate, turretservo;
 
@@ -185,7 +185,7 @@ public class TeleV3 extends LinearOpMode {
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
-
+        kickstand = hardwareMap.get(DcMotorEx.class, "kickstand");
 
 
         outtake = hardwareMap.get(DcMotorEx.class, "outtake");
@@ -371,23 +371,33 @@ public class TeleV3 extends LinearOpMode {
 
                 }
 
+                while (gamepad2.right_trigger>0.1){
+
+                    kickstand.setPower(1);
+                }
+                while (gamepad2.left_trigger>0.1){
+
+                    kickstand.setPower(-1);
+                }
+                kickstand.setPower(0);
 
 
 
 
 
-                if (gamepad1.dpad_up){//HOOD ALL THE WAY DOWN
+
+                if (gamepad2.dpad_up){//HOOD ALL THE WAY DOWN
                     hood.setPosition(1);
                 }
-                if (gamepad1.dpad_left){
+                if (gamepad2.dpad_left){
                     hood.setPosition(0.6);
                 }
 
 
-                if (gamepad1.dpad_right){
+                if (gamepad2.dpad_right){
                     hood.setPosition(0.3);
                 }
-                if (gamepad1.dpad_down){//HOOD ALL THE WAY UP
+                if (gamepad2.dpad_down){//HOOD ALL THE WAY UP
                     hood.setPosition(0.05);
                 }
 
