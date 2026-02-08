@@ -25,7 +25,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Autonomous(name = "RedAutoLC", group = "Autonomous")
+@Autonomous(name = "RedAutoLC", group = "LC")
 public class RedAutoLC extends LinearOpMode{
 
     double Speed;
@@ -82,7 +82,7 @@ public class RedAutoLC extends LinearOpMode{
         public class HoodActivation implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Hood.setPosition(0.175);
+                Hood.setPosition(0.1);
                 return false;
             }
         }
@@ -129,8 +129,8 @@ public class RedAutoLC extends LinearOpMode{
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setVelocity(2900*28/60);
-                    outtake2.setVelocity(2900*28/60);
+                    outtake.setVelocity(2700*28/60);
+                    outtake2.setVelocity(2700*28/60);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -239,7 +239,7 @@ public class RedAutoLC extends LinearOpMode{
         public class TurretTurnShootingPOS implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                TurretTurn.setPosition(1);
+                TurretTurn.setPosition(0.95);
                 return false;
             }
         }
@@ -254,7 +254,7 @@ public class RedAutoLC extends LinearOpMode{
 
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-65, 38, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(-63, 40, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
 
         Intake intake = new Intake(hardwareMap);
@@ -277,6 +277,8 @@ public class RedAutoLC extends LinearOpMode{
                 .strafeToConstantHeading(new Vector2d(-15, 55))
                 .build();
 
+
+
         Action ShootRow1 = drive.actionBuilder(new Pose2d(-15,55,Math.toRadians(90)))
                 .strafeToConstantHeading(new Vector2d(-30,15))
 //                .strafeToConstantHeading(new Vector2d(-12,20))
@@ -290,9 +292,7 @@ public class RedAutoLC extends LinearOpMode{
                 .splineToConstantHeading(new Vector2d(12, 55), Math.PI / 2)
                 .build();
 
-        Action OpenGate1 = drive.actionBuilder(new Pose2d(12, 48, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(0, 56), -Math.PI / 2)
-                .build();
+
 
         Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, 55, Math.toRadians(90)))
                 .setTangent(Math.toRadians(270))
@@ -330,7 +330,8 @@ public class RedAutoLC extends LinearOpMode{
         if (isStopRequested()) return;
 
         Action trajectoryActionChosen;
-        if (startPosition == 1) {
+        trajectoryActionChosen = GoToFirstRow.build();
+  /*      if (startPosition == 1) {
             trajectoryActionChosen = GoToFirstRow.build();
         } else if (startPosition == 2) {
             trajectoryActionChosen = GoToFirstRow.build();
@@ -339,13 +340,14 @@ public class RedAutoLC extends LinearOpMode{
 
 
 
-        }
+        } */
 
         Actions.runBlocking(
                 new ParallelAction(
                         shooter.ShootOut()
 
                 )
+
         );
         Actions.runBlocking(
                 new ParallelAction(
@@ -397,9 +399,12 @@ public class RedAutoLC extends LinearOpMode{
                 new ParallelAction(
                         gate.closeGate(),
                         IntakeRowTwo,
-                        intake.intakeIn()
+                        intake.intakeIn  ()
                 )
         );
+
+
+
         Actions.runBlocking(
                 new ParallelAction (
                         gate.closeGate(),

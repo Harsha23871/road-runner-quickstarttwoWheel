@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp.Tests;
+package org.firstinspires.ftc.teamcode.Auto.Tests;
 
 import android.util.Log;
 

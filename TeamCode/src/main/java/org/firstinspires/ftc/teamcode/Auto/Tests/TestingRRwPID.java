@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp.Tests;//package org.firstinspires.ftc.teamcode.tuning;
+package org.firstinspires.ftc.teamcode.Auto.Tests;//package org.firstinspires.ftc.teamcode.tuning;
 
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -82,7 +82,7 @@ public class TestingRRwPID extends LinearOpMode{
         public class HoodActivation implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Hood.setPosition(0.175);
+                Hood.setPosition(0.1);
                 return false;
             }
         }
@@ -239,7 +239,7 @@ public class TestingRRwPID extends LinearOpMode{
         public class TurretTurnShootingPOS implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                TurretTurn.setPosition(1);
+                TurretTurn.setPosition(0.8);
                 return false;
             }
         }
@@ -403,12 +403,7 @@ public class TestingRRwPID extends LinearOpMode{
                 )
         );
 
-        Actions.runBlocking(
-                new ParallelAction(
-                       OpenGate1,
-                        intake.intakeIn()
-                )
-        );
+
 
         Actions.runBlocking(
                 new ParallelAction (

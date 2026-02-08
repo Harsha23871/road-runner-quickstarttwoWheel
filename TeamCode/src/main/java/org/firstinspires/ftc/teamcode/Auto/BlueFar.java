@@ -2,13 +2,8 @@ package org.firstinspires.ftc.teamcode.Auto;//package org.firstinspires.ftc.team
 
 
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-
-import org.firstinspires.ftc.teamcode.TeleOp.AprilTagsWebCam;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 
 import androidx.annotation.NonNull;
@@ -23,11 +18,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
-
 
 
 
@@ -35,8 +26,8 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 
 @Config
-@Autonomous(name = "RedAuto", group = "Autonomous")
-public class RedAuto extends LinearOpMode {
+@Autonomous(name = "BlueFar ", group = "LC")
+public class BlueFar extends LinearOpMode {
 
 
     public class Gate {
@@ -52,7 +43,7 @@ public class RedAuto extends LinearOpMode {
         public class CloseGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0.3);
+                Gate.setPosition(0.15);
                 return false;
             }
         }
@@ -93,7 +84,7 @@ public class RedAuto extends LinearOpMode {
         public class HoodActivation implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Hood.setPosition(0.6);
+                Hood.setPosition(0);
                 return false;
             }
         }
@@ -119,7 +110,7 @@ public class RedAuto extends LinearOpMode {
         public class TurretTurnShootingPOS implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                TurretTurn.setPosition(1);
+                TurretTurn.setPosition(0.7);
                 return false;
             }
         }
@@ -147,13 +138,13 @@ public class RedAuto extends LinearOpMode {
         public class IntakeInLong implements Action {
             private boolean initialized = false;
             private long startTime;
-            private final long runTimeMs = 3000; // 1 second (change this)
+            private final long runTimeMs = 6000; // 1 second (change this)
 
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    intake.setPower(0.7);
+                    intake.setPower(1);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -187,52 +178,55 @@ public class RedAuto extends LinearOpMode {
         public Shooter(HardwareMap hardwareMap) {
             outtake = hardwareMap.get(DcMotorEx.class, "outtake");
             outtake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            outtake.setDirection(DcMotorEx.Direction.FORWARD);
-            outtake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+            outtake.setDirection(DcMotorEx.Direction.REVERSE);
+            outtake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            outtake.setVelocityPIDFCoefficients(8, 0, 0.01, 8.8);
+
 
 
             outtake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
             outtake2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             outtake2.setDirection(DcMotorEx.Direction.FORWARD);
-            outtake2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-//            outtake.setVelocityPIDFCoefficients(1.489409090909091, 0.1489409090909091, 0, 14.89409090909091);
+            outtake2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            outtake2.setVelocityPIDFCoefficients(8, 0, 0.01, 8.8);
 
 
         }
 
         public class ShooterOut implements Action {
             private boolean initialized = false;
-            private long startTime;
-            private final long runTimeMs = 3000; // 1 second (change this)
+            // 1 second (change this)
 
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setPower(-0.5);
-                    outtake2.setPower(0.5);
-                    startTime = System.currentTimeMillis();
+                    outtake.setVelocity(3500*28/60);
+                    outtake2.setVelocity(3500*28/60);
+
                     initialized = true;
                 }
 
 
-                long elapsed = System.currentTimeMillis() - startTime;
-                packet.put("intakeTimeMs", elapsed);
 
 
-                if (elapsed < runTimeMs) {
+
+                if (!initialized) {
                     return true; // keep running
                 } else {
-                    outtake.setPower(0);
-                    outtake2.setPower(0);
+                    outtake.setVelocity(3500*28/60);
+                    outtake2.setVelocity(3500*28/60);
                     return false; // action finished
                 }
             }
         }
-
         public Action ShootOut() {
-            return new ShooterOut();
+            return new Shooter.ShooterOut();
+
         }
+
+
+
     }
 
     public class Feeder {
@@ -299,7 +293,7 @@ public class RedAuto extends LinearOpMode {
 
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-60, 38, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(63, 14, Math.toRadians(180));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
 
@@ -316,20 +310,18 @@ public class RedAuto extends LinearOpMode {
 
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .strafeToConstantHeading(new Vector2d(-10, 30));
+                .splineTo(new Vector2d(36, -24), Math.toRadians(270));
 
 
         Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
 
-
-
-                .strafeToConstantHeading(new Vector2d(-10, 60))
+                .strafeToConstantHeading(new Vector2d(-10, -60))
                 .waitSeconds(0.5)
 
 
                 .build();
-        Action trajectoryActionCloseout2 = tab1.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-7, 25))
+        Action IntakeRow3 = tab1.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(36, -55))
 
 
 
@@ -340,10 +332,10 @@ public class RedAuto extends LinearOpMode {
 
 
                 .build();
-        Action trajectoryActionCloseout3 = tab1.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(15, -12))
-
-
+        Action ShootRow3 = tab1.endTrajectory().fresh()
+                .splineToConstantHeading(new Vector2d(36, -24), Math.toRadians(270))
+                .setTangent(360)
+                .strafeToLinearHeading(new Vector2d(63,-12),Math.toRadians(180))
                 .build();
         Action trajectoryActionCloseout4 = tab1.endTrajectory().fresh()
                 .strafeToConstantHeading(new Vector2d(15, -50))
@@ -373,83 +365,110 @@ public class RedAuto extends LinearOpMode {
 
 
         Actions.runBlocking(
-                new SequentialAction(
+                new ParallelAction(
+                        gate.closeGate(),
+                        shooter.ShootOut(),
                         hood.HoodActivation(),
-                        // gate.openGate(),
-                        shooter.ShootOut()
-
-
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
-                        shooter.ShootOut(),
-                        intake.intakeIn()
-
-                )
-        );
-
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        trajectoryActionChosen,
-                        turretTurn.TurretTurnShootingPOS(),
-                        gate.closeGate()
-
-                )
-        );
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        trajectoryActionCloseOut,
-                        intake.intakeIn(),
-                        shooter.ShootOut()
-
+                        turretTurn.TurretTurnShootingPOS()
 
                 ));
         Actions.runBlocking(
-                new ParallelAction(
-                        trajectoryActionCloseout2,
-                        gate.openGate(),
-                        shooter.ShootOut()
-
-                )
-        );//6 ball end
-
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        shooter.ShootOut(),
-                        intake.intakeIn()
-
-
-                ));
-        Actions.runBlocking(
-                new ParallelAction(
+                new SequentialAction(
                         shooter.ShootOut(),
                         gate.openGate()
-
+                ));
+        Actions.runBlocking(
+                new ParallelAction(
+                        gate.openGate(),
+                        shooter.ShootOut(),
+                        intake.intakeIn()
 
                 )
         );
         Actions.runBlocking(
                 new SequentialAction(
+                        trajectoryActionChosen,
+                        gate.closeGate(),
+                        new ParallelAction(
+                                IntakeRow3,
+                                intake.intakeIn()
+                        )
 
+                )
 
-                        trajectoryActionCloseout2,
-                        shooter.ShootOut()
-
-
-                ));
-
-
+        );
         Actions.runBlocking(
                 new ParallelAction(
+                        ShootRow3,
                         shooter.ShootOut(),
-                        intake.intakeIn()
+                        new ParallelAction(
+                                shooter.ShootOut(),
+                                intake.intakeIn()
+                        )
+                )
+        );
+//
+//
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        trajectoryActionChosen,
+//                        turretTurn.TurretTurnShootingPOS(),
+//                        gate.closeGate()
+//
+//                )
+//        );
+//
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        trajectoryActionCloseOut,
+//                        intake.intakeIn(),
+//                        shooter.ShootOut()
+//
+//
+//                ));
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        trajectoryActionCloseout2,
+//                        gate.openGate(),
+//                        shooter.ShootOut()
+//
+//                )
+//        );//6 ball end
+//
+//
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        shooter.ShootOut(),
+//                        intake.intakeIn()
+//
+//
+//                ));
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        shooter.ShootOut(),
+//                        gate.openGate()
+//
+//
+//                )
+//        );
+//        Actions.runBlocking(
+//                new SequentialAction(
+//
+//
+//                        trajectoryActionCloseout2,
+//                        shooter.ShootOut()
+//
+//
+//                ));
+//
+//
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        shooter.ShootOut(),
+//                        intake.intakeIn()
+//
 
 
-                ));
 //                new SequentialAction(
 //                        trajectoryActionCloseout3
 //

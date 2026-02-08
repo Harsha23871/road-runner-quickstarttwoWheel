@@ -25,8 +25,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Autonomous(name = "BlueAutoLC", group = "LC")
-public class BlueAutoLC extends LinearOpMode{
+@Autonomous(name = "RedAutowgate", group = "LC")
+public class RedAutowgate extends LinearOpMode{
 
     double Speed;
     public class Intake {
@@ -239,7 +239,7 @@ public class BlueAutoLC extends LinearOpMode{
         public class TurretTurnShootingPOS implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                TurretTurn.setPosition(0.1);
+                TurretTurn.setPosition(0.95);
                 return false;
             }
         }
@@ -254,7 +254,7 @@ public class BlueAutoLC extends LinearOpMode{
 
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-63, -40, Math.toRadians(270));
+        Pose2d initialPose = new Pose2d(-63, 40, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
 
         Intake intake = new Intake(hardwareMap);
@@ -270,38 +270,42 @@ public class BlueAutoLC extends LinearOpMode{
 
 
         TrajectoryActionBuilder GoToFirstRow = drive.actionBuilder(initialPose)
-                .strafeToConstantHeading(new Vector2d(-15, -25));
+                .strafeToConstantHeading(new Vector2d(-15, 25));
 
 
-        Action IntakeRow1 = drive.actionBuilder(new Pose2d(-15, -25, Math.toRadians(270)))
-                .strafeToConstantHeading(new Vector2d(-15, -55))
+        Action IntakeRow1 = drive.actionBuilder(new Pose2d(-15, 25, Math.toRadians(90)))
+                .strafeToConstantHeading(new Vector2d(-15, 55))
                 .build();
 
-        Action ShootRow1 = drive.actionBuilder(new Pose2d(-15,-55,Math.toRadians(270)))
-                .strafeToConstantHeading(new Vector2d(-30,-15))
+        Action OpenGate1 = drive.actionBuilder(new Pose2d(-15, 55, Math.toRadians(90)))
+                .strafeToConstantHeading(new Vector2d(-5, 45))
+
+                .strafeToConstantHeading(new Vector2d(-5, 58))
+                .waitSeconds(1)
+                .build();
+
+        Action ShootRow1 = drive.actionBuilder(new Pose2d(-5,58,Math.toRadians(90)))
+                .strafeToConstantHeading(new Vector2d(-30,15))
 //                .strafeToConstantHeading(new Vector2d(-12,20))
 //                .turn(Math.toRadians(-45))
                 .build();
 
 
 
-        Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-30, -15, Math.toRadians(270)))
+        Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-30, 15, Math.toRadians(90)))
                 .setTangent(Math.toRadians(330))
-                .splineToConstantHeading(new Vector2d(12, -55), -Math.PI / 2)
+                .splineToConstantHeading(new Vector2d(12, 55), Math.PI / 2)
                 .build();
 
-        Action OpenGate1 = drive.actionBuilder(new Pose2d(12, 55, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(0, 56), -Math.PI / 2)
+
+        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, 55, Math.toRadians(90)))
+                .setTangent(Math.toRadians(270))
+                .splineToConstantHeading(new Vector2d(-30, 15), -Math.PI / 2)
                 .build();
 
-        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, -55, Math.toRadians(270)))
-                .setTangent(Math.toRadians(100))
-                .splineToConstantHeading(new Vector2d(-30, -15), Math.PI / 2)
-                .build();
-
-        Action leave = drive.actionBuilder(new Pose2d(-30, -15, Math.toRadians(270)))
+        Action leave = drive.actionBuilder(new Pose2d(-30, 15, Math.toRadians(90)))
                 .setTangent(Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(0, -40),  Math.PI / 2)
+                .splineToConstantHeading(new Vector2d(0, 40), -Math.PI / 2)
                 .build();
 
         Action IntakeFromGate = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(90)))
@@ -369,6 +373,7 @@ public class BlueAutoLC extends LinearOpMode{
                 new ParallelAction(
                         hood.HoodActivation(),
                         IntakeRow1,
+                        OpenGate1,
                         intake.intakeIn(),
                         turretTurn.TurretTurnShootingPOS()
                 )

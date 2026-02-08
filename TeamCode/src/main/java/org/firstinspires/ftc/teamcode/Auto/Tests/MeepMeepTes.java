@@ -1,13 +1,7 @@
-package org.firstinspires.ftc.teamcode.TeleOp.Tests;//package org.firstinspires.ftc.teamcode.tuning;
+package org.firstinspires.ftc.teamcode.Auto.Tests;//package org.firstinspires.ftc.teamcode.tuning;
 
-import com.acmerobotics.roadrunner.ParallelAction;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.teamcode.Auto.RedAuto;
-import org.firstinspires.ftc.teamcode.TeleOp.AprilTagsWebCam;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
@@ -20,10 +14,6 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 

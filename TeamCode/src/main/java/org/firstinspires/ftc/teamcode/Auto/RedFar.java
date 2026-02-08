@@ -22,12 +22,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 
-
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 
 @Config
-@Autonomous(name = "RedFar ", group = "Autonomous")
+@Autonomous(name = "RedFar ", group = "LC")
 public class RedFar extends LinearOpMode {
 
 
@@ -111,7 +110,7 @@ public class RedFar extends LinearOpMode {
         public class TurretTurnShootingPOS implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                TurretTurn.setPosition(0.5);
+                TurretTurn.setPosition(0.3);
                 return false;
             }
         }
@@ -139,13 +138,13 @@ public class RedFar extends LinearOpMode {
         public class IntakeInLong implements Action {
             private boolean initialized = false;
             private long startTime;
-            private final long runTimeMs = 3000; // 1 second (change this)
+            private final long runTimeMs = 6000; // 1 second (change this)
 
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    intake.setPower(0.7);
+                    intake.setPower(1);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -179,15 +178,17 @@ public class RedFar extends LinearOpMode {
         public Shooter(HardwareMap hardwareMap) {
             outtake = hardwareMap.get(DcMotorEx.class, "outtake");
             outtake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            outtake.setDirection(DcMotorEx.Direction.FORWARD);
-            outtake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+            outtake.setDirection(DcMotorEx.Direction.REVERSE);
+            outtake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            outtake.setVelocityPIDFCoefficients(8, 0, 0.01, 8.8);
+
 
 
             outtake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
             outtake2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             outtake2.setDirection(DcMotorEx.Direction.FORWARD);
-            outtake2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-//            outtake.setVelocityPIDFCoefficients(1.489409090909091, 0.1489409090909091, 0, 14.89409090909091);
+            outtake2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            outtake2.setVelocityPIDFCoefficients(8, 0, 0.01, 8.8);
 
 
         }
@@ -201,9 +202,8 @@ public class RedFar extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setVelocity(5500*28/60);
-                    outtake2.setVelocity(5500*28/60);
-
+                    outtake.setVelocity(3500*28/60);
+                    outtake2.setVelocity(3500*28/60);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -216,16 +216,20 @@ public class RedFar extends LinearOpMode {
                 if (elapsed < runTimeMs) {
                     return true; // keep running
                 } else {
-                    outtake.setPower(0);
-                    outtake2.setPower(0);
+                    outtake.setVelocity(0);
+                    outtake2.setVelocity(0);
                     return false; // action finished
                 }
             }
         }
-
         public Action ShootOut() {
-            return new ShooterOut();
+            return new Shooter.ShooterOut();
+
         }
+
+
+
+
     }
 
     public class Feeder {
@@ -292,7 +296,7 @@ public class RedFar extends LinearOpMode {
 
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(64, 12, Math.toRadians(180));
+        Pose2d initialPose = new Pose2d(63, 14, Math.toRadians(180));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
 
@@ -334,10 +338,10 @@ public class RedFar extends LinearOpMode {
         Action ShootRow3 = tab1.endTrajectory().fresh()
                 .splineToConstantHeading(new Vector2d(36, 24), Math.toRadians(90))
                 .setTangent(360)
-                .strafeToLinearHeading(new Vector2d(64,12),Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(63,12),Math.toRadians(180))
                 .build();
         Action trajectoryActionCloseout4 = tab1.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(15, -50))
+                .strafeToConstantHeading(new Vector2d(15, 50))
 
                 .build();
 
@@ -364,15 +368,25 @@ public class RedFar extends LinearOpMode {
 
 
         Actions.runBlocking(
-                new SequentialAction(
+                new ParallelAction(
+                        shooter.ShootOut(),
                         hood.HoodActivation(),
-                        turretTurn.TurretTurnShootingPOS(),
-                        // gate.openGate(),
-                        shooter.ShootOut()
-                ));
-//        );
+                        turretTurn.TurretTurnShootingPOS()
+
+
+                )
+
+        );
         Actions.runBlocking(
                 new ParallelAction(
+                        shooter.ShootOut(),
+                        intake.intakeIn()
+
+                )
+        );
+        Actions.runBlocking(
+                new ParallelAction(
+                        gate.openGate(),
                         shooter.ShootOut(),
                         intake.intakeIn()
 

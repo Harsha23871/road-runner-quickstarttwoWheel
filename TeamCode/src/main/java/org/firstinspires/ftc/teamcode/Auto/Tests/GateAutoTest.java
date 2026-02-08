@@ -1,9 +1,8 @@
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.Auto.Tests;
 
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import androidx.annotation.NonNull;
@@ -47,7 +46,7 @@ public class GateAutoTest extends LinearOpMode{
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    intake.setPower(1);
+                    intake.setPower(0.9);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -82,7 +81,7 @@ public class GateAutoTest extends LinearOpMode{
         public class HoodActivation implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Hood.setPosition(0.175);
+                Hood.setPosition(0.05);
                 return false;
             }
         }
@@ -129,8 +128,8 @@ public class GateAutoTest extends LinearOpMode{
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    outtake.setVelocity(2700*28/60);
-                    outtake2.setVelocity(2700*28/60);
+                    outtake.setVelocity(2800*28/60);
+                    outtake2.setVelocity(2800*28/60);
                     startTime = System.currentTimeMillis();
                     initialized = true;
                 }
@@ -153,10 +152,10 @@ public class GateAutoTest extends LinearOpMode{
             return new Shooter.ShooterOut();
 
         }
+
         public class ShooterRev implements Action {
             private boolean initialized = false;
-            private long startTime;
-            private final long runTimeMs = 3000; // 1 second (change this)
+           // 1 second (change this)
 
 
             @Override
@@ -164,20 +163,19 @@ public class GateAutoTest extends LinearOpMode{
                 if (!initialized) {
                     outtake.setVelocity(3500*28/60);
                     outtake2.setVelocity(3500*28/60);
-                    startTime = System.currentTimeMillis();
+
                     initialized = true;
                 }
 
 
-                long elapsed = System.currentTimeMillis() - startTime;
-                packet.put("intakeTimeMs", elapsed);
 
 
-                if (elapsed < runTimeMs) {
+
+                if (!initialized) {
                     return true; // keep running
                 } else {
-                    outtake.setVelocity(0);
-                    outtake2.setVelocity(0);
+                    outtake.setVelocity(3500*28/60);
+                    outtake2.setVelocity(3500*28/60);
                     return false; // action finished
                 }
             }
@@ -239,7 +237,7 @@ public class GateAutoTest extends LinearOpMode{
         public class TurretTurnShootingPOS implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                TurretTurn.setPosition(1);
+                TurretTurn.setPosition(0.8);
                 return false;
             }
         }
@@ -254,7 +252,7 @@ public class GateAutoTest extends LinearOpMode{
 
 
     public void runOpMode() throws InterruptedException {
-        Pose2d initialPose = new Pose2d(-65, 38, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(-63, 40, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap,initialPose);
 
         Intake intake = new Intake(hardwareMap);
@@ -268,55 +266,54 @@ public class GateAutoTest extends LinearOpMode{
         int visionOutputPosition = 1;
 
 
-
         TrajectoryActionBuilder GoToFirstRow = drive.actionBuilder(initialPose)
-                .strafeToConstantHeading(new Vector2d(-15, 25));
+                .strafeToConstantHeading(new Vector2d(-15, 20));
 
 
-        Action IntakeRow1 = drive.actionBuilder(new Pose2d(-15, 25, Math.toRadians(90)))
-                .strafeToConstantHeading(new Vector2d(-15, 55))
+        Action IntakeRow1 = drive.actionBuilder(new Pose2d(-15, 20, Math.toRadians(90)))
+                .waitSeconds(0.5)
+                .strafeToConstantHeading(new Vector2d(-15, 50))
                 .build();
 
-        Action ShootRow1 = drive.actionBuilder(new Pose2d(-15,55,Math.toRadians(90)))
-                .strafeToConstantHeading(new Vector2d(-30,15))
-//                .strafeToConstantHeading(new Vector2d(-12,20))
-//                .turn(Math.toRadians(-45))
+        Action OpenGate1 = drive.actionBuilder(new Pose2d(-15, 50, Math.toRadians(90)))
+                .strafeToConstantHeading(new Vector2d(-5, 45))
+
+
+
+                .strafeToConstantHeading(new Vector2d(-5, 55))
+                .waitSeconds(1)
                 .build();
 
 
 
-        Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-65, 38, Math.toRadians(90)))
+
+        Action ShootRow1 = drive.actionBuilder(new Pose2d(-5,50,Math.toRadians(90)))
+                .strafeToConstantHeading(new Vector2d(-25,15))
+                .build();
+
+        Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-25, 15, Math.toRadians(90)))
                 .setTangent(Math.toRadians(330))
-                .splineToConstantHeading(new Vector2d(12, 55), Math.PI / 2)
+                .splineToConstantHeading(new Vector2d(12, 50), Math.PI / 2)
                 .build();
 
-        Action OpenGate1 = drive.actionBuilder(new Pose2d(12, 55, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(0, 56), -Math.PI / 2)
-                .build();
+//        Action BackFromGate1 = drive.actionBuilder(new Pose2d(0, 55, Math.toRadians(90)))
+//                .strafeToConstantHeading(new Vector2d(12, 50))
+//                .build();
 
-        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, 55, Math.toRadians(90)))
+
+        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, 50, Math.toRadians(90)))
                 .setTangent(Math.toRadians(270))
-                .splineToConstantHeading(new Vector2d(-30, 15), -Math.PI / 2)
+                .splineToConstantHeading(new Vector2d(-25, 15),-Math.PI/2)
                 .build();
 
-        Action leave = drive.actionBuilder(new Pose2d(-30, 15, Math.toRadians(90)))
+
+
+        Action leave = drive.actionBuilder(new Pose2d(-25, 15, Math.toRadians(90)))
                 .setTangent(Math.toRadians(0))
                 .splineToConstantHeading(new Vector2d(0, 40), -Math.PI / 2)
                 .build();
 
-        Action IntakeFromGate = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(90)))
-                .setTangent(20)
-                .splineTo(new Vector2d(10, 58), Math.toRadians(100))
 
-                .build();
-
-        Action IntakeRowThree = drive.actionBuilder(new Pose2d(-10, 10, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(36, 48), Math.PI / 2)
-                .build();
-
-        Action ComebackToShootRowThree = drive.actionBuilder(new Pose2d(36, 48, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(-10, 10), -Math.PI / 2)
-                .build();
 
 
 
@@ -331,16 +328,15 @@ public class GateAutoTest extends LinearOpMode{
 
         Action trajectoryActionChosen;
         trajectoryActionChosen = GoToFirstRow.build();
-  /*      if (startPosition == 1) {
+       if (startPosition == 1) {
             trajectoryActionChosen = GoToFirstRow.build();
         } else if (startPosition == 2) {
             trajectoryActionChosen = GoToFirstRow.build();
         } else {
-            trajectoryActionChosen = GoToFirstRow.build();
+           trajectoryActionChosen = GoToFirstRow.build();
 
 
-
-        } */
+       }
 
         Actions.runBlocking(
                 new ParallelAction(
@@ -359,80 +355,96 @@ public class GateAutoTest extends LinearOpMode{
 
         Actions.runBlocking(
                 new ParallelAction(
-                        IntakeRowTwo,
-                        gate.closeGate(),
-                        hood.HoodActivation()
-
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
-                        hood.HoodActivation(),
                         IntakeRow1,
                         intake.intakeIn(),
+                        gate.closeGate(),
+                        hood.HoodActivation(),
+                        shooter.ShootRev(),
                         turretTurn.TurretTurnShootingPOS()
+
+                )
+        );
+        Actions.runBlocking(
+                new SequentialAction(
+                        OpenGate1
                 )
         );
 
         Actions.runBlocking(
-                new ParallelAction (
+                new ParallelAction(
                         ShootRow1,
-                        intake.intakeIn(),
-                        shooter.ShootRev()
-
-
-                ));
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        gate.openGate()
-                ));
-
-
-        Actions.runBlocking(
-                new ParallelAction (
-                        shooter.ShootRev(),
                         intake.intakeIn()
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
-                        gate.closeGate(),
-                        IntakeRowTwo,
-                        intake.intakeIn()
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
-                        OpenGate1,
-                        intake.intakeIn()
+
                 )
         );
 
-        Actions.runBlocking(
-                new ParallelAction (
-                        gate.closeGate(),
-                        shooter.ShootRev(),
-                        intake.intakeIn(),
-                        ComebackToShootRowTwo
-                )
-        );
         Actions.runBlocking(
                 new SequentialAction (
-                        gate.openGate()
-                )
-        );
+                        gate.openGate(),
+                        intake.intakeIn()
+                ));
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        gate.closeGate(),
+                        intake.intakeIn(),
+                        IntakeRowTwo
+
+                ));
+        Actions.runBlocking(
+                new ParallelAction(
+                        ComebackToShootRowTwo,
+                        intake.intakeIn()
+
+                ));
+        Actions.runBlocking(
+                new SequentialAction(
+                   gate.openGate()
+                ));
+
+
         Actions.runBlocking(
                 new ParallelAction (
-                        shooter.ShootRev(),
                         intake.intakeIn()
                 )
         );
         Actions.runBlocking(
-                new ParallelAction (
+                new SequentialAction(
+
                         leave
                 )
         );
+//        Actions.runBlocking(
+//                new ParallelAction(
+//                        OpenGate1,
+//                        intake.intakeIn()
+//                )
+//        );
+//
+//        Actions.runBlocking(
+//                new ParallelAction (
+//                        gate.closeGate(),
+//                        shooter.ShootRev(),
+//                        intake.intakeIn(),
+//                        ComebackToShootRowTwo
+//                )
+//        );
+//        Actions.runBlocking(
+//                new SequentialAction (
+//                        gate.openGate()
+//                )
+//        );
+//        Actions.runBlocking(
+//                new ParallelAction (
+//                        shooter.ShootRev(),
+//                        intake.intakeIn()
+//                )
+//        );
+//        Actions.runBlocking(
+//                new ParallelAction (
+//                        leave
+//                )
+//        );
 
 
 
