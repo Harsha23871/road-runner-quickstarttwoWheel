@@ -203,7 +203,7 @@ public class BlueAutoLC extends LinearOpMode{
         public class CloseGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0.15);
+                Gate.setPosition(0.95);
                 return false;
             }
         }
@@ -216,7 +216,7 @@ public class BlueAutoLC extends LinearOpMode{
         public class OpenGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0);
+                Gate.setPosition(0.75);
                 return false;
             }
         }
@@ -239,7 +239,7 @@ public class BlueAutoLC extends LinearOpMode{
         public class TurretTurnShootingPOS implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                TurretTurn.setPosition(0.1);
+                TurretTurn.setPosition(0.25);
                 return false;
             }
         }

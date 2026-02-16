@@ -203,7 +203,7 @@ public class BlueAutowgate extends LinearOpMode{
         public class CloseGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0.15);
+                Gate.setPosition(0.95);
                 return false;
             }
         }
@@ -216,7 +216,7 @@ public class BlueAutowgate extends LinearOpMode{
         public class OpenGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0);
+                Gate.setPosition(0.75);
                 return false;
             }
         }
@@ -280,26 +280,26 @@ public class BlueAutowgate extends LinearOpMode{
         Action OpenGate1 = drive.actionBuilder(new Pose2d(-15, -55, Math.toRadians(270)))
                 .strafeToConstantHeading(new Vector2d(-5, -45))
 
-                .strafeToConstantHeading(new Vector2d(-5, -55))
+                .strafeToConstantHeading(new Vector2d(-5, -60))
                 .waitSeconds(1)
                 .build();
 
-        Action ShootRow1 = drive.actionBuilder(new Pose2d(-5,-55,Math.toRadians(270)))
+        Action ShootRow1 = drive.actionBuilder(new Pose2d(-5,-60,Math.toRadians(270)))
                 .strafeToConstantHeading(new Vector2d(-30,-15))
 //                .strafeToConstantHeading(new Vector2d(-12,20))
 //                .turn(Math.toRadians(-45))
                 .build();
 
 
-        .
+
 
         Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-30, -15, Math.toRadians(270)))
                 .setTangent(Math.toRadians(330))
-                .splineToConstantHeading(new Vector2d(12, -55), -Math.PI / 2)
+                .splineToConstantHeading(new Vector2d(12, -60), -Math.PI / 2)
                 .build();
 
 
-        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, -55, Math.toRadians(270)))
+        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, -60, Math.toRadians(270)))
                 .setTangent(Math.toRadians(100))
                 .splineToConstantHeading(new Vector2d(-30, -15), Math.PI / 2)
                 .build();

@@ -189,17 +189,17 @@ public class TeleV3 extends LinearOpMode {
 
 
         outtake = hardwareMap.get(DcMotorEx.class, "outtake");
+        outtake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        outtake.setDirection(DcMotorEx.Direction.REVERSE);
+        outtake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        outtake.setVelocityPIDFCoefficients(8, 0, 0.01, 8.8);
+
+
         outtake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
-        outtake.setDirection(DcMotorSimple.Direction.FORWARD);
-        outtake2.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        outtake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);// tune this
-        outtake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        outtake.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
-                new PIDFCoefficients(8, 0, 0.01, 8.8));
-        outtake2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
-                new PIDFCoefficients(8, 0, 0.01, 8.8));
+        outtake2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        outtake2.setDirection(DcMotorEx.Direction.FORWARD);
+        outtake2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        outtake2.setVelocityPIDFCoefficients(8, 0, 0.01, 8.8);
 
 
 
@@ -308,23 +308,23 @@ public class TeleV3 extends LinearOpMode {
 
 
                 if (gamepad2.y) {
-                    outtake.setPower(-0.7);
-                    outtake2.setPower(0.7);
+                    outtake.setVelocity(-0.7);
+                    outtake2.setVelocity(0.7);
 
 
 
 
                 } else if (gamepad2.b) { // stop flywheel
-                    outtake.setPower(0);
-                    outtake2.setPower(0);
+                    outtake.setVelocity(0);
+                    outtake2.setVelocity(0);
 
 
 
 
                 }
                 else if (gamepad2.a) { // stop flywheel
-                    outtake.setPower(-1);
-                    outtake2.setPower(1);
+                    outtake.setVelocity(3500*28/60);//-1
+                    outtake2.setVelocity(3500*28/60);//1
 
 
 
@@ -335,11 +335,11 @@ public class TeleV3 extends LinearOpMode {
 
 
                 if (gamepad2.x) {
-                    outtake.setPower(0.7);
-                    outtake2.setPower(-0.7);
+                    outtake.setVelocity(2700*28/60);
+                    outtake2.setVelocity(2700*28/60);
                 } else if (gamepad2.b) { // stop flywheel
-                    outtake.setPower(0);
-                    outtake2.setPower(0);
+                    outtake.setVelocity(0);
+                    outtake2.setVelocity(0);
 
 
 
@@ -350,14 +350,14 @@ public class TeleV3 extends LinearOpMode {
 
 
                 if (gamepad2.right_bumper){
-                    gate.setPosition(0.15);
+                    gate.setPosition(1);
 
 
 
 
                 }
                 if (gamepad2.left_bumper){
-                    gate.setPosition(0);
+                    gate.setPosition(0.65);
 
 
 
@@ -386,7 +386,7 @@ public class TeleV3 extends LinearOpMode {
 
 
 
-                if (gamepad2.dpad_up){//HOOD ALL THE WAY DOWN
+                if (gamepad2.dpad_down){//HOOD ALL THE WAY DOWN
                     hood.setPosition(1);
                 }
                 if (gamepad2.dpad_left){
@@ -397,7 +397,7 @@ public class TeleV3 extends LinearOpMode {
                 if (gamepad2.dpad_right){
                     hood.setPosition(0.3);
                 }
-                if (gamepad2.dpad_down){//HOOD ALL THE WAY UP
+                if (gamepad2.dpad_up){//HOOD ALL THE WAY UP
                     hood.setPosition(0.05);
                 }
 

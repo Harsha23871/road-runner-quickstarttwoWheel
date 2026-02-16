@@ -203,7 +203,7 @@ public class RedAutowgate extends LinearOpMode{
         public class CloseGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0.15);
+                Gate.setPosition(0.95);
                 return false;
             }
         }
@@ -216,7 +216,7 @@ public class RedAutowgate extends LinearOpMode{
         public class OpenGate implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Gate.setPosition(0);
+                Gate.setPosition(0.75);
                 return false;
             }
         }
@@ -294,11 +294,11 @@ public class RedAutowgate extends LinearOpMode{
 
         Action IntakeRowTwo = drive.actionBuilder(new Pose2d(-30, 15, Math.toRadians(90)))
                 .setTangent(Math.toRadians(330))
-                .splineToConstantHeading(new Vector2d(12, 55), Math.PI / 2)
+                .splineToConstantHeading(new Vector2d(12, 60), Math.PI / 2)
                 .build();
 
 
-        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, 55, Math.toRadians(90)))
+        Action ComebackToShootRowTwo = drive.actionBuilder(new Pose2d(12, 60, Math.toRadians(90)))
                 .setTangent(Math.toRadians(270))
                 .splineToConstantHeading(new Vector2d(-30, 15), -Math.PI / 2)
                 .build();
@@ -373,11 +373,16 @@ public class RedAutowgate extends LinearOpMode{
                 new ParallelAction(
                         hood.HoodActivation(),
                         IntakeRow1,
-                        OpenGate1,
                         intake.intakeIn(),
                         turretTurn.TurretTurnShootingPOS()
                 )
         );
+        Actions.runBlocking(
+                new SequentialAction(
+                        OpenGate1
+                )
+        );
+
 
         Actions.runBlocking(
                 new ParallelAction (
